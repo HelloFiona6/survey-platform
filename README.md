@@ -23,7 +23,7 @@ No need to install or configure any database!
 ## 2. Clone the Project
 
 ```bash
-git clone <your-repo-url> survey-platform
+git clone https://github.com/HelloFiona6/survey-platform.git survey-platform
 cd survey-platform
 ```
 
@@ -51,6 +51,7 @@ npm run dev
 - The backend will run on [http://localhost:5000](http://localhost:5000)
 - You should see `Server running on port 5000` in the terminal.
 
+If you encounter `Error: Cannot find module 'sqlite3'`, run `npm install sqlite3` first.
 ---
 
 ## 4. Frontend Setup
