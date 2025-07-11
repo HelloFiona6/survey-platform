@@ -10,15 +10,10 @@ PATH = '.'
 SAMPLER = 'quarter'
 
 
-def quadrant_cluster():
-    cell_index = np.random.randint(0, 2, 2)
-    pos = np.random.normal((cell_index*2+1)/4, 0.1, 2)
-    return pos
-
 DOT_SAMPLERS = {
     'uniform': lambda: np.random.uniform(0, 1, 2),
     'normal': lambda: np.random.normal(0.5, 0.2, 2),
-    'quarter': quadrant_cluster,
+    'quarter': lambda: np.random.normal((np.random.randint(0, 2, 2)+0.5)/2, 0.1),
 }
 
 
