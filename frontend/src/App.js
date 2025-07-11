@@ -1,64 +1,51 @@
 import React, { useState } from 'react';
-import './App.css';
 import LoginPage from './pages/LoginPage';
-import TaskSelector from './pages/TaskSelector';
-import DotsTask from './pages/DotsTask';
+import ConsentPage from './pages/ConsentPage';
+import TutorialPage from './pages/TutorialPage';
+import PracticePage from './pages/PracticePage';
+import StrategyPage from './pages/StrategyPage';
+import MainTasksPage from './pages/MainTasksPage';
+import FeedbackPage from './pages/FeedbackPage';
+import EndPage from './pages/EndPage';
 
 function App() {
-  const [username, setUsername] = useState('');
-  const [group, setGroup] = useState('untrained');
-  const [user, setUser] = useState(null);
-  const [error, setError] = useState('');
-  const [task, setTask] = useState('');
+  const [page, setPage] = useState('login');
+  const [user, setUser] = useState(null); // { id, group }
+  const [consentGiven, setConsentGiven] = useState(false);
 
-  const handleRegister = async () => {
-    if (!username) {
-      setError('Please enter a username.');
-      return;
-    }
-    setError('');
-    try {
-      const res = await fetch('http://localhost:5000/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, group }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUser(data);
-      } else {
-        setError(data.error || 'Registration failed.');
-      }
-    } catch (e) {
-      setError('Network error.');
-    }
-  };
+  // ...other global state
 
-  if (!user) {
-    return (
-      <LoginPage
-        username={username}
-        setUsername={setUsername}
-        group={group}
-        setGroup={setGroup}
-        onRegister={handleRegister}
-        error={error}
-      />
-    );
+  if (page === 'login') {
+    return <LoginPage onLogin={(user) => { setUser(user); setPage('consent'); }} />;
   }
-
-  if (!task) {
-    return <TaskSelector onSelect={setTask} />;
+  if (page === 'consent') {
+    return <ConsentPage onConsent={() => setPage('tutorial')} />;
   }
-  if (task === 'dots') {
-    return <DotsTask user={user} onBack={() => setTask('')} />;
+  if (page === 'tutorial') {
+    return <TutorialPage group={user.group} onContinue={() => {
+      if (user.group === 'untrained') setPage('mainTasks');
+      else setPage('practice');
+    }} />;
   }
-  return (
-    <div className="App">
-      <h2>Coming soon...</h2>
-      <button onClick={() => setTask('')}>Back to Main</button>
-    </div>
-  );
+  if (page === 'practice') {
+    return <PracticePage group={user.group} onComplete={() => {
+      if (user.group === 'expert') setPage('strategy');
+      else setPage('mainTasks');
+    }} />;
+  }
+  if (page === 'strategy') {
+    return <StrategyPage onContinue={() => setPage('mainTasks')} />;
+  }
+  if (page === 'mainTasks') {
+    return <MainTasksPage user={user} onComplete={() => setPage('feedback')} />;
+  }
+  if (page === 'feedback') {
+    return <FeedbackPage user={user} onSubmit={() => setPage('end')} />;
+  }
+  if (page === 'end') {
+    return <EndPage />;
+  }
+  return null;
 }
 
 export default App;
