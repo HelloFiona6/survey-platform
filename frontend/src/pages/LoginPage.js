@@ -29,52 +29,49 @@ export default function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div className="App" style={{ minWidth: 320, boxShadow: '0 2px 12px #0001', padding: 32, borderRadius: 12, background: '#fff' }}>
-        <h2>Login / Register</h2>
-        <div style={{ margin: '1em 0' }}>
+    <div className="card">
+      <h2>Login / Register</h2>
+      <input
+        type="text"
+        placeholder="Enter username"
+        value={username}
+        onChange={e => setUsername(e.target.value)}
+        style={{ width: '100%' }}
+      />
+      <div style={{ margin: '1em 0' }}>
+        <label>
           <input
-            type="text"
-            placeholder="Enter username"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
+            type="radio"
+            name="group"
+            value="untrained"
+            checked={group === 'untrained'}
+            onChange={() => setGroup('untrained')}
           />
-        </div>
-        <div style={{ margin: '1em 0' }}>
-          <label>
-            <input
-              type="radio"
-              name="group"
-              value="untrained"
-              checked={group === 'untrained'}
-              onChange={() => setGroup('untrained')}
-            />
-            Untrained
-          </label>
-          <label style={{ marginLeft: '1em' }}>
-            <input
-              type="radio"
-              name="group"
-              value="exposure"
-              checked={group === 'exposure'}
-              onChange={() => setGroup('exposure')}
-            />
-            Exposure
-          </label>
-          <label style={{ marginLeft: '1em' }}>
-            <input
-              type="radio"
-              name="group"
-              value="expert"
-              checked={group === 'expert'}
-              onChange={() => setGroup('expert')}
-            />
-            Expert
-          </label>
-        </div>
-        <button onClick={handleRegister}>Enter</button>
-        {error && <div style={{ color: 'red', marginTop: '1em' }}>{error}</div>}
+          Untrained
+        </label>
+        <label style={{ marginLeft: '1em' }}>
+          <input
+            type="radio"
+            name="group"
+            value="exposure"
+            checked={group === 'exposure'}
+            onChange={() => setGroup('exposure')}
+          />
+          Exposure
+        </label>
+        <label style={{ marginLeft: '1em' }}>
+          <input
+            type="radio"
+            name="group"
+            value="expert"
+            checked={group === 'expert'}
+            onChange={() => setGroup('expert')}
+          />
+          Expert
+        </label>
       </div>
+      <button onClick={handleRegister} style={{ width: '100%' }}>Enter</button>
+      {error && <div style={{ color: 'red', marginTop: '1em' }}>{error}</div>}
     </div>
   );
 } 
