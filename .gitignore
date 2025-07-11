@@ -1,2 +1,2 @@
-.idea/
-S
+**/.idea
+**/node_modules
