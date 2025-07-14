@@ -1,5 +1,5 @@
 import {useMemo, useRef, useState} from "react";
-
+import './ImageSorter.css'
 /**
  * ImageSorter Component
  *
@@ -112,21 +112,16 @@ function ImageSorter({images}) {
     let tempImageList = [...imageList];
     const draggedItem = tempImageList[draggedItemOriginalIndex.current];
 
-    // Create a list where the original item is conceptually replaced by a placeholder
-    // This list will be used to determine the initial layout before inserting the dragged item.
-    let listWithPlaceholderAtOriginalSpot = imageList.map((img, idx) => idx === draggedItemOriginalIndex.current ? {
-          id: 'placeholder',
-          uri: '',
-          alt: 'Placeholder',
-          isPlaceholder: true
-        } // Special placeholder object
-        : {...img, isPlaceholder: false});
+    // The image list when the user hasn't dropped the image
+    let listWithPlaceholderAtOriginalSpot = imageList.map(
+      (img, idx) => idx === draggedItemOriginalIndex.current ? { // Special placeholder object
+        id: 'placeholder', uri: '', alt: 'Placeholder', isPlaceholder: true
+      } : {
+        ...img, isPlaceholder: false
+      });
 
-    // Remove the placeholder from its original spot as the dragged item is "moving"
+    // the dragged image is inserted to another position
     listWithPlaceholderAtOriginalSpot.splice(draggedItemOriginalIndex.current, 1);
-
-    // Insert the actual dragged item (not the placeholder) at the hovered position
-    // Mark it as not a placeholder, but it will be styled as a "ghost"
     listWithPlaceholderAtOriginalSpot.splice(hoveredOverDisplayIndex.current, 0, {
       ...draggedItem, isPlaceholder: false
     });
@@ -134,45 +129,38 @@ function ImageSorter({images}) {
     return listWithPlaceholderAtOriginalSpot;
   }, [imageList, draggingImageId, draggedItemOriginalIndex.current, hoveredOverDisplayIndex.current, reorderTrigger]);
 
-  return (<div className="flex flex-wrap justify-center gap-4 p-4 bg-white shadow-lg rounded-xl max-w-4xl w-full">
+  return (<div className={"image-list"}>
     {finalDisplayList.map((image, index) => {
-      // Determine if the current item being rendered is the actual image being dragged
       const isCurrentlyDragged = image.id === draggingImageId && !image.isPlaceholder;
-      // Determine if the current item is the placeholder at the original position
       const isPlaceholder = image.isPlaceholder;
 
       return (<div
-          key={image.id === 'placeholder' ? `placeholder-${index}` : image.id} // Unique key for placeholder
-          draggable={!isPlaceholder} // Only allow dragging real images
-          onDragStart={!isPlaceholder ? (e) => handleDragStart(e, image.id, imageList.findIndex(img => img.id === image.id)) : null}
-          onDragOver={(e) => handleDragOver(e, index)}
-          onDrop={handleDrop}
-          onDragEnd={handleDragEnd}
-          className={
-            `flex flex-col items-center p-2 border-2 rounded-lg cursor-grab transition-all duration-200 ease-in-out
-            ${isPlaceholder ? 'border-gray-300 bg-gray-200 opacity-50' : 'border-transparent hover:border-blue-500'}
-            ${isCurrentlyDragged ? 'opacity-50 grayscale' : ''}
-            ${hoveredOverDisplayIndex.current === index && !isCurrentlyDragged && !isPlaceholder ? 'border-blue-500' : ''}`
-          }
+        key={image.id === 'placeholder' ? `placeholder-${index}` : image.id} // Unique key for placeholder
+        draggable={!isPlaceholder} // Only allow dragging real images
+        onDragStart={!isPlaceholder ? (e) => handleDragStart(e, image.id, imageList.findIndex(img => img.id === image.id)) : null}
+        onDragOver={(e) => handleDragOver(e, index)}
+        onDrop={handleDrop}
+        onDragEnd={handleDragEnd}
+        className={`image-holder
+          ${isCurrentlyDragged ? "dragging" : ""}
+          ${hoveredOverDisplayIndex.current === index && !isCurrentlyDragged && !isPlaceholder ? 'hovered-over' : ''}  // rather useless
+        `}
       >
         {/* Number Label for each position */}
-        <p className="text-lg font-semibold text-gray-600 mb-1">#{index + 1}</p>
+        <p className={"index"}>#{index + 1}</p>
 
         {/* Render placeholder content or actual image */}
-        {isPlaceholder ? (<div
-            className="w-32 h-32 flex items-center justify-center text-gray-400 text-sm border border-dashed border-gray-400 rounded-md">
-          Drag Here
-        </div>) : (<img
-            src={image.uri}
-            alt={image.alt}
-            className="w-32 h-32 object-cover rounded-md shadow-md"
-            // Fallback for broken images
+        {isPlaceholder ? (
+          <div className="placeholder">Drag Here</div>
+        ) : (
+          <img src={image.uri} alt={image.alt}
             onError={(e) => {
               e.target.onerror = null; // Prevents infinite loop if fallback also fails
               e.target.src = `https://placehold.co/150x150/CCCCCC/000000?text=Error`;
               console.error(`Failed to load image: ${image.uri}`);
             }}
-        />)}
+          />
+        )}
         {/*{!isPlaceholder && <p className="mt-2 text-sm text-gray-700">{image.alt}</p>}*/}
       </div>);
     })}
