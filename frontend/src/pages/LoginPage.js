@@ -2,26 +2,26 @@ import React, { useState } from 'react';
 
 export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState('');
-  const [group, setGroup] = useState('untrained');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleRegister = async () => {
-    if (!username) {
-      setError('Please enter a username.');
+  const handleLogin = async () => {
+    if (!username || !password) {
+      setError('Please enter both username and password.');
       return;
     }
     setError('');
     try {
-      const res = await fetch('http://localhost:5000/api/register', {
+      const res = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, group }),
+        body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
       if (res.ok) {
-        onLogin({ ...data, username });
+        onLogin(data);
       } else {
-        setError(data.error || 'Registration failed.');
+        setError(data.error || 'Login failed.');
       }
     } catch (e) {
       setError('Network error.');
@@ -30,47 +30,22 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <div className="card">
-      <h2>Login / Register</h2>
+      <h2>Login</h2>
       <input
         type="text"
-        placeholder="Enter username"
+        placeholder="Username"
         value={username}
         onChange={e => setUsername(e.target.value)}
         style={{ width: '100%' }}
       />
-      <div style={{ margin: '1em 0' }}>
-        <label>
-          <input
-            type="radio"
-            name="group"
-            value="untrained"
-            checked={group === 'untrained'}
-            onChange={() => setGroup('untrained')}
-          />
-          Untrained
-        </label>
-        <label style={{ marginLeft: '1em' }}>
-          <input
-            type="radio"
-            name="group"
-            value="exposure"
-            checked={group === 'exposure'}
-            onChange={() => setGroup('exposure')}
-          />
-          Exposure
-        </label>
-        <label style={{ marginLeft: '1em' }}>
-          <input
-            type="radio"
-            name="group"
-            value="expert"
-            checked={group === 'expert'}
-            onChange={() => setGroup('expert')}
-          />
-          Expert
-        </label>
-      </div>
-      <button onClick={handleRegister} style={{ width: '100%' }}>Enter</button>
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        style={{ width: '100%', marginTop: '1em' }}
+      />
+      <button onClick={handleLogin} style={{ width: '100%' }}>Login</button>
       {error && <div style={{ color: 'red', marginTop: '1em' }}>{error}</div>}
     </div>
   );

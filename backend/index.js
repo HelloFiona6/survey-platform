@@ -35,6 +35,62 @@ app.post('/api/register', (req, res) => {
   );
 });
 
+// 用户登录（仅允许已存在用户登录）
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required.' });
+  }
+  db.get('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, user) => {
+    if (err) return res.status(500).json({ error: 'Database error.' });
+    if (!user) return res.status(401).json({ error: 'Invalid username or password.' });
+    res.json({ id: user.id, username: user.username, group: user.group });
+  });
+});
+
+// 管理员端：获取所有用户
+app.get('/api/users', (req, res) => {
+  db.all('SELECT id, username, "group", created_at FROM users', [], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error.' });
+    res.json(rows);
+  });
+});
+
+// 管理员端：增删改查用户
+app.post('/api/user', (req, res) => {
+  const { username, password, group } = req.body;
+  if (!username || !password || !group) {
+    return res.status(400).json({ error: 'Missing fields.' });
+  }
+  db.run('INSERT INTO users (username, password, "group") VALUES (?, ?, ?)', [username, password, group], function(err) {
+    if (err) return res.status(500).json({ error: 'Database error.' });
+    res.json({ id: this.lastID });
+  });
+});
+
+app.put('/api/user/:id', (req, res) => {
+  const { password, group } = req.body;
+  db.run('UPDATE users SET password = ?, "group" = ? WHERE id = ?', [password, group, req.params.id], function(err) {
+    if (err) return res.status(500).json({ error: 'Database error.' });
+    res.json({ changes: this.changes });
+  });
+});
+
+app.delete('/api/user/:id', (req, res) => {
+  db.run('DELETE FROM users WHERE id = ?', [req.params.id], function(err) {
+    if (err) return res.status(500).json({ error: 'Database error.' });
+    res.json({ changes: this.changes });
+  });
+});
+
+// 管理员端：查询所有作答情况
+app.get('/api/responses', (req, res) => {
+  db.all(`SELECT responses.*, users.username, users.group FROM responses LEFT JOIN users ON responses.user_id = users.id`, [], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error.' });
+    res.json(rows);
+  });
+});
+
 // 获取Dots题目
 app.get('/api/dots-questions', (req, res) => {
   const count = parseInt(req.query.count) || 10;

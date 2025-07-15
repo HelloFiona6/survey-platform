@@ -5,6 +5,9 @@ const db = new sqlite3.Database('./survey.db');
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    email TEXT UNIQUE,
     "group" TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
@@ -12,9 +15,9 @@ db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS questions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     type TEXT NOT NULL, -- dots/mst
-    params TEXT NOT NULL, -- JSON, to record param in questions
-    correct TEXT NOT NULL, -- JSON/numerial
-    strategy TEXT, -- can be null
+    params TEXT NOT NULL, -- JSON字符串，描述题目参数
+    correct TEXT NOT NULL, -- 正确答案，JSON或数值
+    strategy TEXT, -- 适用策略，可为空
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
@@ -30,6 +33,13 @@ db.serialize(() => {
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(question_id) REFERENCES questions(id)
   )`);
+
+  // 插入管理员账号（如不存在）
+  db.get('SELECT * FROM users WHERE username = ?', ['admin'], (err, row) => {
+    if (!row) {
+      db.run('INSERT INTO users (username, password, "group") VALUES (?, ?, ?)', ['admin', 'admin123', 'admin']);
+    }
+  });
 });
 
 module.exports = db;

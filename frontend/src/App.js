@@ -8,6 +8,7 @@ import StrategyPage from './pages/StrategyPage';
 import MainTasksPage from './pages/MainTasksPage';
 import FeedbackPage from './pages/FeedbackPage';
 import EndPage from './pages/EndPage';
+import AdminPage from './pages/AdminPage';
 import { CSSTransition, SwitchTransition } from 'react-transition-group';
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
   const nodeRef = useRef(null);
 
   // 只在 mainTasks 之前显示 hero 和 overlay
-  const showHero = !['mainTasks', 'feedback', 'end'].includes(page);
+  const showHero = !['mainTasks', 'feedback', 'end', 'admin'].includes(page);
 
   return (
     <>
@@ -46,7 +47,14 @@ function App() {
               <div className="hero-content">
                 {/* 页面内容 */}
                 {page === 'login' && (
-                  <LoginPage onLogin={user => { setUser(user); setPage('consent'); }} />
+                  <LoginPage onLogin={user => {
+                    setUser(user);
+                    if (user.group === 'admin') {
+                      setPage('admin');
+                    } else {
+                      setPage('consent');
+                    }
+                  }} />
                 )}
                 {page === 'consent' && (
                   <ConsentPage onConsent={() => setPage('tutorial')} />
@@ -77,6 +85,9 @@ function App() {
                   <FeedbackPage user={user} onSubmit={() => setPage('end')} />
                 )}
                 {page === 'end' && <EndPage />}
+                {page === 'admin' && (
+                  <AdminPage onLogout={() => { setUser(null); setPage('login'); }} />
+                )}
               </>
             )}
           </div>
