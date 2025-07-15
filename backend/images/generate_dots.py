@@ -8,7 +8,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from manage_imgs import append_index_row
+from manage_imgs import append_index_row, init_index
 
 DOT_NUMBERS = range(40,60)  # for each image. we may use range iterators or list comprehensions
 DOT_SEP = 0.03  # don't overlap
@@ -62,6 +62,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # os.makedirs(args.PATH, exist_ok=True)
     sampler_name = args.DISTRIBUTION
+    init_index()
     for idx, n_dots in enumerate(args.DOT_NUMBERS):
         existing_locations = []
         dots = len(existing_locations)
@@ -77,6 +78,9 @@ if __name__ == "__main__":
             distances = [np.linalg.norm(loc - new_location) for loc in existing_locations]
             if any([dist < args.DOT_SEP for dist in distances]):
                 continue
+
+            existing_locations.append(new_location)
+            plt.plot(*new_location, 'ko', markersize=DOT_SEP*100, markeredgewidth=0)
 
         axes = plt.gca()
         axes.set_xlim([-0.05,1.05])
