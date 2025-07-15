@@ -136,14 +136,17 @@ app.get('/api/main-tasks', (req, res) => {
       // params 字段中提取图片名，拼接为图片URL
       const tasks = rows.map(row => {
         let img = '';
+        let distribution = '';
         try {
           const params = JSON.parse(row.params);
           img = params.img ? `http://localhost:5000/images/${params.img}` : '';
+          distribution = params.distribution || '';
         } catch {}
         return {
           id: row.id,
           type: row.type,
-          image: img
+          image: img,
+          distribution: distribution
         };
       });
       res.json(tasks);

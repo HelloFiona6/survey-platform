@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DotEstimationTask from '../components/DotEstimationTask';
-// import ImageSorter from '../components/ImageSorter'
+import ImageSorter from '../components/ImageSorter'
 
 // export default function MainTasksPage({user, onComplete}) {
 //   let images = [
@@ -78,23 +78,32 @@ export default function MainTasksPage({ user, onComplete }) {
 
   const task = tasks[current];
   if (task.type === 'dots') {
+    let filename = '';
+    if (task.image) {
+      const parts = task.image.split('/');
+      filename = parts[parts.length - 1];
+    }
     return (
       <DotEstimationTask
         image={task.image}
+        filename={filename}
+        distribution={task.distribution}
         onSubmit={handleDotSubmit}
-        timeLimit={15}
-        remaining={tasks.length - current - 1}
+        timeLimit={30}
+        total={tasks.length}
+        current={current}
+        title="Estimate the number of dots"
       />
     );
   }
-  // if (task.type === 'ranking') {
-  //   return (
-  //     <ImageRankingTask
-  //       images={task.images}
-  //       onSubmit={handleRankingSubmit}
-  //       timeLimit={30}
-  //     />
-  //   );
-  // }
+  if (task.type === 'ranking') {
+    return (
+      <ImageSorter
+        images={task.images}
+        onSubmit={handleRankingSubmit}
+        timeLimit={30}
+      />
+    );
+  }
   return null;
 } 

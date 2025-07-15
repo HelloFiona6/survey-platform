@@ -1,9 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
+import BubbleProgressBar from './BubbleProgressBar';
 
-export default function DotEstimationTask({ image, onSubmit, timeLimit = 15, remaining }) {
+export default function DotEstimationTask({
+  image, filename, distribution, onSubmit,
+  timeLimit = 30, remaining, total, current, title = 'Estimate the number of dots'
+}) {
   const [input, setInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const [showInfo, setShowInfo] = useState(false);
   const timerRef = useRef();
+  const inputRef = useRef();
 
   useEffect(() => {
     setTimeLeft(timeLimit);
@@ -17,6 +23,8 @@ export default function DotEstimationTask({ image, onSubmit, timeLimit = 15, rem
         return t - 1;
       });
     }, 1000);
+    // 自动聚焦输入框
+    if (inputRef.current) inputRef.current.focus();
     return () => clearInterval(timerRef.current);
     // eslint-disable-next-line
   }, [image]);
@@ -28,23 +36,84 @@ export default function DotEstimationTask({ image, onSubmit, timeLimit = 15, rem
   };
 
   return (
-    <div>
-      <h3>Estimate the number of dots</h3>
-      <div style={{ margin: '1em 0' }}>
-        <img src={image} alt="dots" style={{ maxWidth: 400, maxHeight: 400, border: '1px solid #ccc' }} />
+    <div style={{ position: 'relative', maxWidth: 600, margin: '0 auto', padding: '0 0 2.5em 0' }}>
+      {/* 标题 */}
+      <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 8, letterSpacing: -1 }}>{title}</div>
+      {/* 进度条 */}
+      <BubbleProgressBar total={total} current={current} />
+      {/* 倒计时在图片外部右上角 */}
+      <div style={{
+        position: 'absolute', top: 18, right: 18, zIndex: 10,
+        background: '#fff', color: '#0071e3', borderRadius: 14,
+        padding: '4px 20px', fontWeight: 700, fontSize: 22,
+        boxShadow: '0 2px 8px #0001', border: '2px solid #e0e0e0',
+        minWidth: 70, textAlign: 'center', letterSpacing: 1
+      }}>{timeLeft}s</div>
+      {/* info icon */}
+      <div style={{ position: 'fixed', left: 24, bottom: 24, zIndex: 100 }}>
+        <span
+          style={{
+            display: 'inline-block',
+            width: 32,
+            height: 32,
+            borderRadius: '50%',
+            background: '#f5f6fa',
+            color: '#0071e3',
+            fontWeight: 700,
+            fontSize: 20,
+            textAlign: 'center',
+            lineHeight: '32px',
+            boxShadow: '0 2px 8px #0001',
+            cursor: 'pointer',
+            userSelect: 'none',
+            border: '2px solid #e0e0e0',
+          }}
+          title="Show image info"
+          onClick={() => setShowInfo(v => !v)}
+        >i</span>
+        {showInfo && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 38,
+              left: 0,
+              minWidth: 180,
+              background: '#fff',
+              color: '#222',
+              borderRadius: 10,
+              boxShadow: '0 4px 16px #0002',
+              padding: '1em',
+              fontSize: 15,
+              zIndex: 100,
+              textAlign: 'left',
+            }}
+          >
+            <div style={{ fontWeight: 600, marginBottom: 6 }}>Image Info</div>
+            <div><b>Filename:</b> {filename || 'N/A'}</div>
+            {distribution && <div><b>Distribution:</b> {distribution}</div>}
+          </div>
+        )}
       </div>
-      <div>Time left: <b>{timeLeft}s</b></div>
-      <input
-        type="number"
-        placeholder="Your estimate"
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        style={{ margin: '1em 0', width: 120 }}
-      />
-      <button onClick={() => handleSubmit(false)}>Submit</button>
-      {typeof remaining === 'number' && (
-        <div style={{ marginTop: '1em' }}>Remaining: {remaining}</div>
-      )}
+      {/* 图片 */}
+      <div style={{ margin: '2.5em 0 2.5em 0', display: 'flex', justifyContent: 'center' }}>
+        <img src={image} alt="dots" style={{ maxWidth: 420, maxHeight: 420, border: '1.5px solid #ccc', borderRadius: 16, boxShadow: '0 4px 24px #0001' }} />
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+        <input
+          type="number"
+          placeholder="Your estimate"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          ref={inputRef}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              handleSubmit(false);
+            }
+          }}
+          style={{ margin: '1em 0', width: 160, fontSize: 18, borderRadius: 10, padding: '0.7em 1em', border: '1.5px solid #e0e0e0', boxShadow: '0 2px 8px #0001' }}
+        />
+        <button onClick={() => handleSubmit(false)} style={{ width: 180, fontSize: 18, borderRadius: 10, padding: '0.7em 0', boxShadow: '0 2px 8px #0071e355', background: '#0071e3', color: '#fff', fontWeight: 700, border: 'none' }}>Submit</button>
+      </div>
     </div>
   );
 }
