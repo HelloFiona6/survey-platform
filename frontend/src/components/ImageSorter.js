@@ -26,28 +26,31 @@ function ImageSorter({images}) {
   // useRef to store the index of the item being dragged over in the *current display order*
   const hoveredOverDisplayIndex = useRef(null);
 
+  const dragIcon = new Image();
+  dragIcon.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   /**
    * Handles the start of a drag operation.
    * Stores the ID and original index of the dragged item.
-   * @param {Event} e - The drag event.
+   * @param {DragEvent} e - The drag event.
    * @param {string} imageId - The ID of the image being dragged.
    * @param {number} originalIndex - The original index of the image in the imageList.
    */
-  const handleDragStart = (e, imageId, originalIndex) => {
+  function handleDragStart(e, imageId, originalIndex) {
     draggedItemOriginalIndex.current = originalIndex;
     setDraggingImageId(imageId); // Set state to trigger re-render for styling
-    e.dataTransfer.effectAllowed = "move"; // Set drag effect
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setDragImage(dragIcon,0,0)
     console.log('Drag started for ID:', imageId, 'at original index:', originalIndex);
-  };
+  }
 
   /**
    * Handles the drag over event.
    * Prevents default to allow dropping.
    * Updates the hoveredOverDisplayIndex and forces a re-render for immediate visual reordering.
-   * @param {Event} e - The drag event.
+   * @param {DragEvent} e - The drag event.
    * @param {number} displayIndex - The index of the image being dragged over in the current display list.
    */
-  const handleDragOver = (e, displayIndex) => {
+  function handleDragOver(e, displayIndex) {
     e.preventDefault(); // Necessary to allow dropping
     // Only update if the hover target changes, and it's not dragging over itself in the reordered list
     if (hoveredOverDisplayIndex.current !== displayIndex) {
@@ -55,13 +58,13 @@ function ImageSorter({images}) {
       setReorderTrigger(prev => !prev); // Force re-render for useMemo
       console.log('Dragging over display index:', displayIndex);
     }
-  };
+  }
 
   /**
    * Handles the drop event.
    * Reorders the image list based on drag and drop indices.
    */
-  const handleDrop = () => {
+  function handleDrop() {
     // Check if a valid drag operation was in progress
     if (draggingImageId === null || draggedItemOriginalIndex.current === null || hoveredOverDisplayIndex.current === null) {
       // Reset if a drop happens without a valid drag state (e.g., dropped outside valid target)
@@ -84,7 +87,7 @@ function ImageSorter({images}) {
     hoveredOverDisplayIndex.current = null;
     setReorderTrigger(false);
     console.log('Drop completed. New order:', newImageList.map(img => img.id));
-  };
+  }
 
   /**
    * Handles the drag end event.
