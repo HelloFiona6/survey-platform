@@ -6,9 +6,6 @@ import os, argparse, csv
 
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
-import argparse
-import math
 
 # 命令行参数
 # python backend/images/generate_dots.py -d uniform normal -n 15
@@ -67,20 +64,19 @@ parser.add_argument(
 )
 
 
-
-
 if __name__ == "__main__":
     args = parser.parse_args()
     # os.makedirs(args.PATH, exist_ok=True)
     index = {"filename":[], "n_dots":[], "sampler":[]}
     for idx, n_dots in enumerate(args.DOT_NUMBERS):
+        sampler = args.SAMPLER
         existing_locations = []
         dots = len(existing_locations)
 
         #add each dot
         plt.clf()
         while len(existing_locations) != n_dots:
-            new_location = DOT_SAMPLERS[args.SAMPLER]()
+            new_location = DOT_SAMPLERS[sampler]()
             if not np.all((0 < new_location) & (new_location < 1)):
                 continue
 
@@ -88,38 +84,7 @@ if __name__ == "__main__":
             distances = [np.linalg.norm(loc - new_location) for loc in existing_locations]
             if any([dist < args.DOT_SEP for dist in distances]):
                 continue
-        else:
-            raise ValueError('Unknown distribution')
-        # 检查与已有点的距离
-        if all(math.hypot(x - px, y - py) >= min_dist for px, py in points):
-            points.append((x, y))
-        attempts += 1
-    if len(points) < n:
-        raise RuntimeError(f'Could not place {n} points with min_dist={min_dist}')
-    return zip(*points)
 
-for i, count in enumerate(dot_counts):
-    if len(distribution_types) == 1:
-        dist_type = distribution_types[0]
-    else:
-        dist_type = random.choice(distribution_types)
-    # 生成点，保证最小距离
-    x, y = generate_points(count, dist_type, min_dist=0.05)
-    filename = f'dots_{i+1:03d}.png'
-    plt.figure(figsize=(3, 3))
-    plt.scatter(list(x), list(y), s=30, c='black')
-    plt.axis('off')
-    plt.xlim(0, 1)
-    plt.ylim(0, 1)
-    plt.tight_layout(pad=0)
-    plt.savefig(os.path.join(output_dir, filename), bbox_inches='tight', pad_inches=0)
-    plt.close()
-    questions.append({
-        'filename': filename,
-        'true_count': count,
-        'distribution': dist_type
-    })
-            
         axes = plt.gca()
         axes.set_xlim([-0.05,1.05])
         axes.set_ylim([-0.05,1.05])
