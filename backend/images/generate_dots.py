@@ -1,26 +1,20 @@
 """
 Generate dots of various numbers and distributions for the dots activity
-CCurrently, dots are named by
+Currently, subscripts name dot images.
 """
-import os, argparse, csv
+import argparse
+import os
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-# 命令行参数
-# python backend/images/generate_dots.py -d uniform normal -n 15
-parser = argparse.ArgumentParser(description='Generate dot images for estimation tasks.')
-parser.add_argument('-d', '--distribution', nargs='+', default='uniform',
-                    help='Distribution types to use (e.g. uniform normal). If not set, random for each image.')
-parser.add_argument('-n', '--num', type=int, default=1,
-                    help='Number of images to generate. If not set, random between 10 and 20.')
-args = parser.parse_args()
-
+from manage_imgs import append_index_row
 
 DOT_NUMBERS = range(40,60)  # for each image. we may use range iterators or list comprehensions
 DOT_SEP = 0.03  # don't overlap
 PATH = '.'
-SAMPLER = 'uniform'
+DISTRIBUTION = 'uniform'
+
 DOT_SAMPLERS = {
     'uniform': lambda: np.random.uniform(0, 1, 2),
     'normal': lambda: np.random.normal(0.5, 0.2, 2),
@@ -54,11 +48,11 @@ parser.add_argument(
          'Defaults to the current directory.'
 )
 parser.add_argument(
-    '-a', '--sampler',
+    '-a', '--distribution',
     type=str,
     choices=DOT_SAMPLERS.keys(),
-    dest="SAMPLER",
-    default=SAMPLER,
+    dest="DISTRIBUTION",
+    default=DISTRIBUTION,
     help=f'The sampling method used for generating dot positions. '
          f'Allowed values: {", ".join(DOT_SAMPLERS.keys())}.'
 )
@@ -67,16 +61,15 @@ parser.add_argument(
 if __name__ == "__main__":
     args = parser.parse_args()
     # os.makedirs(args.PATH, exist_ok=True)
-    index = {"filename":[], "n_dots":[], "sampler":[]}
+    sampler_name = args.DISTRIBUTION
     for idx, n_dots in enumerate(args.DOT_NUMBERS):
-        sampler = args.SAMPLER
         existing_locations = []
         dots = len(existing_locations)
 
         #add each dot
         plt.clf()
         while len(existing_locations) != n_dots:
-            new_location = DOT_SAMPLERS[sampler]()
+            new_location = DOT_SAMPLERS[sampler_name]()
             if not np.all((0 < new_location) & (new_location < 1)):
                 continue
 
@@ -93,12 +86,4 @@ if __name__ == "__main__":
 
         filename = f"NO_{idx}.png"
         plt.savefig(os.path.join(args.PATH, filename), bbox_inches='tight', pad_inches=0)
-        index["filename"].append(filename)
-        index["n_dots"].append(n_dots)
-        index["sampler"].append(SAMPLER)
-
-    with open(os.path.join(args.PATH, "index.csv"), "w") as f:
-        writer = csv.writer(f)
-        headers = index.keys()
-        writer.writerow(headers)
-        writer.writerows(zip(*(index[field] for field in headers)))
+        append_index_row(filename, n_dots, sampler_name)
