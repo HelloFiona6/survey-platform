@@ -54,7 +54,7 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Tailwind's shadow-md */
 }
 
-.image-holder > img.dragging {
+.image-holder.dragging > img {
   opacity: 50%;
   filter: grayscale(100%);
   border-color: #3b82f6;
