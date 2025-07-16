@@ -1,0 +1,97 @@
+#task-container {
+  position: relative;,
+  maxWidth: 600;
+  margin: 0 auto;
+  padding: 0 0 2.5em 0;
+}
+
+#task-container > .title {
+  font-weight: 700;
+  font-size: 22px;
+  margin-bottom: 8px;
+  letter-spacing: -1px;
+}
+
+#timer {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 10;
+  background: #fff;
+  color: #0071e3;
+  border-radius: 14px;
+  padding: 4px 20px;
+  font-weight: 700;
+  font-size: 22px;
+  box-shadow: 0 2px 8px #0001;
+  border: 2px solid #e0e0e0;
+  min-width: 70px;
+  text-align: center;
+  letter-spacing: 1px
+}
+
+#info {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  z-index: 100;
+}
+
+#info > .icon {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f5f6fa;
+  color: #0071e3;
+  font-weight: 700;
+  font-size: 20px;
+  text-align: center;
+  line-height: 32px;
+  box-shadow: 0 2px 8px #0001;
+  cursor: pointer;
+  user-select: none;
+  border: 2px solid #e0e0e0;
+}
+
+#info > .popup {
+  position: absolute;
+  bottom: 38px;
+  left: 0;
+  min-width: 180px;
+  background: #fff;
+  color: #222;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px #0002;
+  padding: 1em;
+  font-size: 15px;
+  z-index: 100;
+  text-align: left;
+}
+
+#task-container .form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+#task-container .form button {
+  width: 180px;
+  font-size: 18px;
+  border-radius: 10px;
+  padding: 0.7em 0;
+  box-shadow: 0 2px 8px #0071e355;
+  background: #0071e3;
+  color: #fff;
+  font-weight: 700;
+  border: none
+}
+
+#task-container .time-up-banner {
+  text-align: center;
+  margin: 2em 0;
+  color: #888;
+  font-size: 20px;
+  font-weight: 500;
+}

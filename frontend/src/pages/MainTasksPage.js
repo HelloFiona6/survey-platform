@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DotEstimationTask from '../components/DotEstimationTask';
-import ImageSorter from '../components/ImageSorter'
+import SortByCountTask from '../components/SortByCountTask';
 
 // export default function MainTasksPage({user, onComplete}) {
 //   let images = [
@@ -98,7 +98,7 @@ export default function MainTasksPage({ user, onComplete }) {
   }
   if (task.type === 'ranking') {
     return (
-      <ImageSorter
+      <SortByCountTask
         images={task.images}
         onSubmit={handleRankingSubmit}
         timeLimit={30}
