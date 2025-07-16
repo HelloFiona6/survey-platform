@@ -24,7 +24,7 @@ def init_index():
 
 
 def append_index_row(filename: str, dot_number: int, distribution: str):
-    with open(INDEX_FILE, 'r+') as f:
+    with open(INDEX_FILE, 'a') as f:
         writer = csv.DictWriter(f, CSV_HEADER)
         writer.writerow({
             FILENAME_KEY: filename,
@@ -78,26 +78,26 @@ if __name__ == "__main__":
     # ==================== 'refresh' command ====================
     refresh_parser = subparsers.add_parser(
         'refresh',
-        help='Refresh data or state within the system.',
-        description='''Refreshes an internal state or fetches the latest data.
-Example: python your_script.py refresh --verbose'''
+        help='Ensure only indexing existing images.'
     )
 
     # ==================== 'sync' command ====================
     sync_parser = subparsers.add_parser(
         'sync',
-        help='Synchronize files or data between locations.',
-        description='''Synchronizes content from a source to a destination.
-Example: python your_script.py sync --source /path/to/local --destination s3://bucket/remote --dry-run'''
+        help='Synchronize index and files by refreshing index and deleting wild images'
     )
 
     args = parser.parse_args()
 
-    if hasattr(args, 'refresh'):
-        refresh_index()
-    elif hasattr(args, 'sync'):
-        refresh_index()
-        remove_unindexed()
+    if hasattr(args, 'command'):
+        if args.command == 'refresh':
+            refresh_index()
+        elif args.command == 'sync':
+            refresh_index()
+            remove_unindexed()
+        else:
+            parser.print_help()
+            exit(2)
     else:
         parser.print_help()
         exit(1)
