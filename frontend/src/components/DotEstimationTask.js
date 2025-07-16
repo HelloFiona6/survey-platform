@@ -10,14 +10,18 @@ export default function DotEstimationTask({
   const [showInfo, setShowInfo] = useState(false);
   const timerRef = useRef();
   const inputRef = useRef();
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [timeUp, setTimeUp] = useState(false);
 
   useEffect(() => {
     setTimeLeft(timeLimit);
+    setIsSubmitted(false);
+    setTimeUp(false);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
           clearInterval(timerRef.current);
-          handleSubmit(true);
+          setTimeUp(true);
           return 0;
         }
         return t - 1;
@@ -30,7 +34,10 @@ export default function DotEstimationTask({
   }, [image]);
 
   const handleSubmit = (auto = false) => {
+    if (isSubmitted) return; // 防止多次提交
     clearInterval(timerRef.current);
+    setIsSubmitted(true);
+    setTimeUp(false);
     onSubmit({ answer: input, timeSpent: timeLimit - timeLeft, auto });
     setInput('');
   };
@@ -75,7 +82,7 @@ export default function DotEstimationTask({
           <div
             style={{
               position: 'absolute',
-              top: 38,
+              bottom: 38,
               left: 0,
               minWidth: 180,
               background: '#fff',
@@ -94,26 +101,40 @@ export default function DotEstimationTask({
           </div>
         )}
       </div>
-      {/* 图片 */}
-      <div style={{ margin: '2.5em 0 2.5em 0', display: 'flex', justifyContent: 'center' }}>
-        <img src={image} alt="dots" style={{ maxWidth: 420, maxHeight: 420, border: '1.5px solid #ccc', borderRadius: 16, boxShadow: '0 4px 24px #0001' }} />
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
-        <input
-          type="number"
-          placeholder="Your estimate"
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          ref={inputRef}
-          onKeyDown={e => {
-            if (e.key === 'Enter') {
-              handleSubmit(false);
-            }
-          }}
-          style={{ margin: '1em 0', width: 160, fontSize: 18, borderRadius: 10, padding: '0.7em 1em', border: '1.5px solid #e0e0e0', boxShadow: '0 2px 8px #0001' }}
-        />
-        <button onClick={() => handleSubmit(false)} style={{ width: 180, fontSize: 18, borderRadius: 10, padding: '0.7em 0', boxShadow: '0 2px 8px #0071e355', background: '#0071e3', color: '#fff', fontWeight: 700, border: 'none' }}>Submit</button>
-      </div>
+      {/* 图片、输入框、按钮区域 */}
+      {!isSubmitted && (
+        <>
+          {!timeUp && (
+            <div style={{ margin: '2.5em 0 2.5em 0', display: 'flex', justifyContent: 'center' }}>
+              <img src={image} alt="dots" style={{ maxWidth: 420, maxHeight: 420, border: '1.5px solid #ccc', borderRadius: 16, boxShadow: '0 4px 24px #0001' }} />
+            </div>
+          )}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+            {timeUp && (
+              <div style={{ color: '#0071e3', fontSize: 18, marginBottom: 8, fontWeight: 500 }}>
+                Time is up, but you can still submit your answer
+              </div>
+            )}
+            <input
+              type="number"
+              placeholder="Your estimate"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              ref={inputRef}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  handleSubmit(false);
+                }
+              }}
+              style={{ margin: '1em 0', width: 160, fontSize: 18, borderRadius: 10, padding: '0.7em 1em', border: '1.5px solid #e0e0e0', boxShadow: '0 2px 8px #0001' }}
+            />
+            <button onClick={() => handleSubmit(false)} style={{ width: 180, fontSize: 18, borderRadius: 10, padding: '0.7em 0', boxShadow: '0 2px 8px #0071e355', background: '#0071e3', color: '#fff', fontWeight: 700, border: 'none' }}>Submit</button>
+          </div>
+        </>
+      )}
+      {isSubmitted && (
+        <div style={{textAlign:'center',margin:'2em 0',color:'#888',fontSize:20,fontWeight:500}}>submitted, wait for processing...</div>
+      )}
     </div>
   );
 }

@@ -129,7 +129,7 @@ app.get('/api/main-tasks', (req, res) => {
   const userId = req.query.user_id;
   // 这里只返回 type 为 dots 的题目，image 字段为图片URL
   db.all(
-    'SELECT id, type, params FROM questions WHERE type = ? ORDER BY id',
+    'SELECT id, type, params FROM questions WHERE type = ? ORDER BY id limit 10',
     ['dots'],
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Database error.' });
