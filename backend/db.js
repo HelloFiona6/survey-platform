@@ -18,6 +18,8 @@ db.serialize(() => {
     params TEXT NOT NULL, -- JSON字符串，描述题目参数
     correct TEXT NOT NULL, -- 正确答案，JSON或数值
     strategy TEXT, -- 适用策略，可为空
+    dot_count INTEGER, -- 点的数量
+    distribution TEXT, -- 分布类型
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 

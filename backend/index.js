@@ -129,7 +129,7 @@ app.get('/api/main-tasks', (req, res) => {
   const userId = req.query.user_id;
   // 这里只返回 type 为 dots 的题目，image 字段为图片URL
   db.all(
-    'SELECT id, type, params FROM questions WHERE type = ? ORDER BY id',
+    'SELECT id, type, params FROM questions WHERE type = ? ORDER BY id limit 10',
     ['dots'],
     (err, rows) => {
       if (err) return res.status(500).json({ error: 'Database error.' });
@@ -150,6 +150,22 @@ app.get('/api/main-tasks', (req, res) => {
         };
       });
       res.json(tasks);
+    }
+  );
+});
+
+// 获取练习任务题目
+app.get('/api/practice-tasks', (req, res) => {
+  const type = req.query.type;
+  const count = parseInt(req.query.count) || 10;
+  db.all(
+    'SELECT id, params, correct, strategy, created_at FROM questions WHERE type = ? ORDER BY RANDOM() LIMIT ?',
+    [type === 'dot' ? 'dots' : type, count],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error.' });
+      }
+      res.json(rows);
     }
   );
 });
