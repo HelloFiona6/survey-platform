@@ -4,6 +4,7 @@ Currently, subscripts name dot images.
 """
 import argparse
 import os
+import uuid
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -63,7 +64,7 @@ if __name__ == "__main__":
     # os.makedirs(args.PATH, exist_ok=True)
     sampler_name = args.DISTRIBUTION
     init_index()
-    for idx, n_dots in enumerate(args.DOT_NUMBERS):
+    for n_dots in args.DOT_NUMBERS:
         existing_locations = []
         dots = len(existing_locations)
 
@@ -88,6 +89,6 @@ if __name__ == "__main__":
         axes.set_aspect('equal')
         plt.axis('off')
 
-        filename = f"NO_{idx}.png"
+        filename = f"{uuid.uuid1()}.png"
         plt.savefig(os.path.join(args.PATH, filename), bbox_inches='tight', pad_inches=0)
         append_index_row(filename, n_dots, sampler_name)
