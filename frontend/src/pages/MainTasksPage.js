@@ -97,6 +97,7 @@ export default function MainTasksPage({ user, onComplete }) {
     );
   }
   if (task.type === 'ranking') {
+    // TODO images should be Array<Object>, need API wrangling
     return (
       <SortByCountTask
         images={task.images}

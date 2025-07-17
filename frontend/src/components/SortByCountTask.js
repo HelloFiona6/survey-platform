@@ -2,16 +2,27 @@ import ImageSorter from "./ImageSorter";
 import React, {useEffect, useRef, useState} from "react";
 import BubbleProgressBar from "./BubbleProgressBar";
 
+/**
+ * Sort images by dot numbers ascending, uses ImageSorter, adds submission and timer.
+ *
+ * @param {{id:String, src:String, alt:String}[]} images passed to ImageSorter
+ * @param {function(Number[]): void} onSubmit callback for answer
+ * @param {Number} timeLimit assume positive
+ * @param total
+ * @param current
+ * @param title
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function SortByCountTask({
-  images, onSubmit, timeLimit, total=1, current=1, title="Sort the images by number of dots ascending"
+  images, onSubmit, timeLimit=30, total=1, current=1, title="Sort the images by number of dots ascending"
 }) {
-  const [input, setInput] = useState('');
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [showInfo, setShowInfo] = useState(false);
-  const timerRef = useRef(-1);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [order, setOrder] = useRef(images.map(I=>I.id));
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const timerRef = useRef(-1);
   const [timeUp, setTimeUp] = useState(false);
-
   useEffect(() => {
     setTimeLeft(timeLimit);
     setIsSubmitted(false);
@@ -28,16 +39,14 @@ function SortByCountTask({
       });
     }, 1000);
     return () => clearInterval(timerRef.current);
-    // eslint-disable-next-line
-  }, [image]);
+  }, [images]);
 
   const handleSubmit = (auto = false) => {
     if (isSubmitted) return; // 防止多次提交
     clearInterval(timerRef.current);
     setIsSubmitted(true);
     setTimeUp(false);
-    onSubmit({ answer: input, timeSpent: timeLimit - timeLeft, auto });
-    setInput('');
+    onSubmit([]);  // TODO find some props for ImageSorter to return
   };
 
 
@@ -66,7 +75,7 @@ function SortByCountTask({
           <button onClick={() => handleSubmit(false)}>Submit</button>
         </div>
       </>) : (
-        <div id={"time-up-banner"}>submitted, wait for processing... </div>
+      <div id={"time-up-banner"}>submitted, wait for processing... </div>
     )}
   </div>
 }

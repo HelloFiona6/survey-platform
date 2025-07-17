@@ -8,26 +8,18 @@ import './ImageSorter.css'
  * position and a grayed-out image at the new hovered position.
  *
  * @param {Object} props - The component props.
- * @param {Array<Object>} props.images - An array of image objects, each with 'id', 'uri', and 'alt' properties.
+ * @param {Object[]} props.images - An array of {id, src, alt} objects
  */
 function ImageSorter({images}) {
-  // State to hold the current order of images
-  const [imageList, setImageList] = useState(images);
-
-  // State to track the ID of the image currently being dragged
+  const [imageList, setImageList] = useState(images);  // current order of images
   const [draggingImageId, setDraggingImageId] = useState(null);
 
-  // Dummy state to force re-render when hoveredOverDisplayIndex changes,
-  // ensuring useMemo re-evaluates for immediate visual feedback.
+  // Pseudo state to force re-render
   const [reorderTrigger, setReorderTrigger] = useState(false);
 
-  // useRef to store the original index of the item being dragged in the actual imageList
   const draggedItemOriginalIndex = useRef(null);
-  // useRef to store the index of the item being dragged over in the *current display order*
-  const hoveredOverDisplayIndex = useRef(null);
+  const hoveredOverDisplayIndex = useRef(null);  // position of the dragging cursor
 
-  const dragIcon = new Image();
-  dragIcon.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
   /**
    * Handles the start of a drag operation.
    * Stores the ID and original index of the dragged item.
@@ -35,27 +27,29 @@ function ImageSorter({images}) {
    * @param {string} imageId - The ID of the image being dragged.
    * @param {number} originalIndex - The original index of the image in the imageList.
    */
-  function handleDragStart(e, imageId, originalIndex) {
+  const handleDragStart = (e, imageId, originalIndex) => {
     draggedItemOriginalIndex.current = originalIndex;
     setDraggingImageId(imageId); // Set state to trigger re-render for styling
     e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setDragImage(dragIcon,0,0)
     console.log('Drag started for ID:', imageId, 'at original index:', originalIndex);
+
+    const dragIcon = new Image();
+    dragIcon.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';  // 1*1 transparent
+    e.dataTransfer.setDragImage(dragIcon,0,0)
   }
 
   /**
    * Handles the drag over event.
-   * Prevents default to allow dropping.
    * Updates the hoveredOverDisplayIndex and forces a re-render for immediate visual reordering.
    * @param {DragEvent} e - The drag event.
    * @param {number} displayIndex - The index of the image being dragged over in the current display list.
    */
-  function handleDragOver(e, displayIndex) {
+  const handleDragOver = (e, displayIndex) => {
     e.preventDefault(); // Necessary to allow dropping
     // Only update if the hover target changes, and it's not dragging over itself in the reordered list
     if (hoveredOverDisplayIndex.current !== displayIndex) {
       hoveredOverDisplayIndex.current = displayIndex;
-      setReorderTrigger(prev => !prev); // Force re-render for useMemo
+      setReorderTrigger(b => !b); // Force re-render for useMemo
       console.log('Dragging over display index:', displayIndex);
     }
   }
@@ -64,7 +58,7 @@ function ImageSorter({images}) {
    * Handles the drop event.
    * Reorders the image list based on drag and drop indices.
    */
-  function handleDrop() {
+  const handleDrop = (event) => {
     // Check if a valid drag operation was in progress
     if (draggingImageId === null || draggedItemOriginalIndex.current === null || hoveredOverDisplayIndex.current === null) {
       // Reset if a drop happens without a valid drag state (e.g., dropped outside valid target)
@@ -93,14 +87,14 @@ function ImageSorter({images}) {
    * Handles the drag end event.
    * Resets drag-related states/refs, useful for cases where drag is canceled (e.g., dropping outside).
    */
-  const handleDragEnd = () => {
+  const handleDragEnd = (event) => {
     // Reset all drag-related states/refs
     setDraggingImageId(null);
     draggedItemOriginalIndex.current = null;
     hoveredOverDisplayIndex.current = null;
     setReorderTrigger(false);
     console.log('Drag ended.');
-  };
+  }
 
   /**
    * Memoized list for display, which includes the immediate reordering effect
