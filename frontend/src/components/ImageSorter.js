@@ -8,7 +8,7 @@ import './ImageSorter.css'
  * position and a grayed-out image at the new hovered position.
  *
  * @param {Object} props - The component props.
- * @param {Array<Object>} props.images - An array of image objects, each with 'id', 'uri', and 'alt' properties.
+ * @param {Object[]} props.images - An array of {id, src, alt} objects
  */
 function ImageSorter({images}) {
   // State to hold the current order of images
