@@ -2,19 +2,27 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const db = require('./db');
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
-
-const fs = require('fs');
 const path = require('path');
-const imagesDir = path.join(__dirname, 'images');
 
+const db = require('./db');
+const runMigrations = require('./migrate');
+const { exit } = require('process');
+
+const imagesDir = path.join(__dirname, 'images');
 const PORT = 5000;
 const BACKEND_DOMAIN = "http://localhost";
 
-app.use('/images', express.static(path.join(__dirname, 'images')));
+if (!db.is_fine()) {
+  console.error('Database is not fine, exiting...');
+  db.close();
+  exit(1);
+}
+// Ensures db is open and migrated
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use('/images', express.static(imagesDir));
 
 app.get('/', (req, res) => {
   res.send('Backend is running!');
@@ -27,13 +35,13 @@ app.post('/api/register', (req, res) => {
     return res.status(400).json({ error: 'Username and group are required.' });
   }
   db.run(
-    'INSERT INTO users ("group") VALUES (?)',
-    [group],
+    'UPDATE users SET "group" = ? WHERE username = ?',
+    [group, username],
     function (err) {
       if (err) {
         return res.status(500).json({ error: 'Database error.' });
       }
-      res.json({ id: this.lastID, username, group });
+      res.json({ message: 'User group updated successfully.', username, group });
     }
   );
 });
@@ -122,7 +130,7 @@ app.get('/api/responses', (req, res) => {
 app.get('/api/dots-questions', (req, res) => {
   const count = parseInt(req.query.count) || 10;
   db.all(
-    'SELECT id, params, correct, strategy, created_at FROM questions WHERE type = ? ORDER BY RANDOM() LIMIT ?',
+    'SELECT id, params, ground_truth, strategy, created_at FROM questions WHERE type = ? ORDER BY RANDOM() LIMIT ?',
     ['dots', count],
     (err, rows) => {
       if (err) {
@@ -135,13 +143,13 @@ app.get('/api/dots-questions', (req, res) => {
 
 // 提交答题
 app.post('/api/response', (req, res) => {
-  const { user_id, question_id, phase, response, correct, time_spent } = req.body;
+  const { user_id, question_id, phase, response, correct, time_spent } = req.body;  // TODO remove phase and correct?
   if (!user_id || !question_id || !phase) {
     return res.status(400).json({ error: 'Missing required fields.' });
   }
   db.run(
-    'INSERT INTO responses (user_id, question_id, phase, response, correct, time_spent) VALUES (?, ?, ?, ?, ?, ?)',
-    [user_id, question_id, phase, response, correct, time_spent],
+    'INSERT INTO responses (user_id, question_id, response, time_spent) VALUES (?, ?, ?, ?)',
+    [user_id, question_id, response, time_spent],
     function (err) {
       if (err) {
         return res.status(500).json({ error: 'Database error.' });
@@ -181,47 +189,70 @@ app.get('/api/main-tasks', (req, res) => {
   );
 });
 
-function initQuestionsFromImages() {
-  const files = fs.readdirSync(imagesDir).filter(f =>
-    /\.(png|jpg|jpeg|gif)$/i.test(f)
-  );
-  let pending = files.length;
-  files.forEach((img) => {
-    db.get(
-      "SELECT id FROM questions WHERE params = ?",
-      [JSON.stringify({ img })],
-      (err, row) => {
-        if (err) {
-          console.error(err);
-          if (--pending === 0) return;
-        }
-        if (!row) {
-          db.run(
-            "INSERT INTO questions (type, params, correct, strategy) VALUES (?, ?, ?, ?)",
-            [
-              "dots",
-              JSON.stringify({ img }),
-              "", // correct 答案可后续补充
-              null
-            ],
-            function (err) {
-              if (err) {
-                console.error(err);
-              } else {
-                console.log(`Inserted question for image: ${img}`);
-              }
-            }
-          );
-        } else {
-          console.log(`Question for image ${img} already exists.`);
-        }
+/**
+ * 获取默认任务题目
+ * 单个SQL查询，找出所有符合给定 用户ID、任务阶段、题目类型 的题目
+ */
+app.get('/api/main-tasks', (req, res) => {
+  const userId = req.query.user_id;
+  // Does SQLite has predicate/selection pushdown?
+  const sql = `
+    WITH T AS (
+      SELECT id FROM tasks
+      WHERE 
+        "group" IN (
+          SELECT "group" FROM user WHERE user_id = ?
+        ) AND type = ?
+    ),
+    Q AS (
+      SELECT question.type, question_id
+      FROM
+        T 
+        JOIN task_question ON T.id = task_question.task_id
+        JOIN question ON question.id = task_question.question_id
+      WHERE question.type = ?
+    )
+    SELECT
+      TQ.question_id AS id,
+      TQ.type AS type,
+      DM.location AS location,
+      DM.distribution AS distribution
+    FROM
+      Q
+      JOIN question_material AS QM ON Q.id = QM.question_id
+      JOIN dot_material AS DM ON DM.id = QM.material_id
+    ORDER BY RANDOM() LIMIT 10
+  `;
+  let tasks = [];
+  db.each(sql, [userId, 'test', 'dots'],  // defaults
+    (err, row) => {  // rowCallback
+      if (err) {
+        console.error('Error fetching row:', err.message);
+        return;
       }
-    );
-  });
-}
+      tasks.push({
+        id: row.id,
+        type: row.type,
+        image: `${BACKEND_DOMAIN}:${PORT}/images/${row.location}`,
+        distribution: row.distribution || ''
+      });
+    },
+    (err, count) => {  // completionCallback
+      if (err) {
+        console.error('Error during db.each completion:', err.message);
+        return res.status(500).json({ error: 'Database error fetching tasks.' });
+      }
+      if (tasks.length === 0) {
+        return res.status(404).json({ message: 'No dot counting tasks found.' });
+      }
+      res.json(tasks);
+      console.log(`Sent ${count} dot counting tasks.`);
+    }
+  );
+})
 
 // 在服务启动时自动插入
-initQuestionsFromImages();
+initQuestionsFromImages(db);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

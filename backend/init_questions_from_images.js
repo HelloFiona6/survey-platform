@@ -1,10 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
 
-const db = new sqlite3.Database('./survey.db');
 const imagesDir = path.join(__dirname, 'images');
-
+/*
 // 读取所有图片文件
 const files = fs.readdirSync(imagesDir).filter(f =>
   /\.(png|jpg|jpeg|gif)$/i.test(f)
@@ -30,7 +28,7 @@ files.forEach((img) => {
       if (!row) {
         db.run(
           "INSERT INTO questions (type, params, correct, strategy) VALUES (?, ?, ?, ?)",
-          ["dots", JSON.stringify({ img }), ""/* correct 答案可后续补充 */, null],
+          ["dots", JSON.stringify({ img }), "", null],// correct 答案可后续补充
           function (err) {
             if (err) {
               console.error(err);
@@ -47,3 +45,46 @@ files.forEach((img) => {
     }
   );
 });
+*/
+
+let files = [];
+function initQuestionsFromImages(db) {
+  const files = fs.readdirSync(imagesDir).filter(f =>
+    /\.(png|jpg|jpeg|gif)$/i.test(f)
+  );
+  let pending = files.length;
+  files.forEach((img) => {
+    db.get(
+      "SELECT id FROM dot_material WHERE location = ?",
+      [JSON.stringify({ img })],
+      (err, row) => {
+        if (err) {
+          console.error(err);
+          if (--pending === 0) return;
+        }
+        if (!row) {
+          db.run(
+            "INSERT INTO questions (type, params, correct, strategy) VALUES (?, ?, ?, ?)",
+            [
+              "dots",
+              JSON.stringify({ img }),
+              "", // correct 答案可后续补充
+              null
+            ],
+            function (err) {
+              if (err) {
+                console.error(err);
+              } else {
+                console.log(`Inserted question for image: ${img}`);
+              }
+            }
+          );
+        } else {
+          console.log(`Question for image ${img} already exists.`);
+        }
+      }
+    );
+  });
+}
+
+module.exports = initQuestionsFromImages;

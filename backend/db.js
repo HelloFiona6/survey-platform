@@ -1,45 +1,57 @@
 // backend/db.js
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('./survey.db');
 
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    email TEXT UNIQUE,
-    "group" TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  )`);
+class SurveyDB {
+  constructor() {
+    this.db = new sqlite3.Database('./survey.db', (err) => {
+      if (err) {
+        console.error('Error opening database:', err.message);
+        throw err;
+      } else {
+        console.log('Connected to the SQLite database.');
+      }
+    });
+  }
 
-  db.run(`CREATE TABLE IF NOT EXISTS questions (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    type TEXT NOT NULL, -- dots/mst
-    params TEXT NOT NULL, -- JSON字符串，描述题目参数
-    correct TEXT NOT NULL, -- 正确答案，JSON或数值
-    strategy TEXT, -- 适用策略，可为空
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  )`);
+  is_fine() {
+    let fine = true;
+    db.get('SELECT 1', (err, row) => {
+      if (err) {
+        fine = false;
+      }
+    });
+    return fine;
+  }
 
-  db.run(`CREATE TABLE IF NOT EXISTS responses (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    question_id INTEGER,
-    phase TEXT NOT NULL, -- practice/test
-    response TEXT,
-    correct BOOLEAN,
-    time_spent INTEGER,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(question_id) REFERENCES questions(id)
-  )`);
+  run(sql, params = [], callBack=undefined) {
+    return this.db.run(sql, params, callBack);
+  }
 
-  // 插入管理员账号（如不存在）
-  db.get('SELECT * FROM users WHERE username = ?', ['admin'], (err, row) => {
-    if (!row) {
-      db.run('INSERT INTO users (username, password, "group") VALUES (?, ?, ?)', ['admin', 'admin123', 'admin']);
-    }
-  });
+  get(sql, params = [], callBack=undefined) {
+    return this.db.get(sql, params, callBack);
+  }
+
+  all(sql, params = [], callBack=undefined) {
+    return this.db.all(sql, params, callBack);
+  }
+
+  exec(sql, callBack=undefined) {
+    return this.db.exec(sql, callBack);
+  }
+
+  close() {
+    return this.db.close();
+  }
+}
+
+const db = new SurveyDB();
+
+runMigrations(db).catch(err => {db.close(); console.error(err); exit(1);});
+// 插入管理员账号（如不存在）
+db.get('SELECT * FROM users WHERE username = ?', ['admin'], (err, row) => {
+  if (!row) {
+    db.run('INSERT INTO users (username, password, "group") VALUES (?, ?, ?)', ['admin', 'admin123', 'admin']);
+  }
 });
 
 module.exports = db;
