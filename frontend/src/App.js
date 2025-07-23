@@ -21,16 +21,57 @@ function App() {
   // 只在 mainTasks 之前显示 hero 和 overlay
   const showHero = !['mainTasks', 'feedback', 'end', 'admin'].includes(page);
 
+  let pageElement;
+  switch (page) {
+    default:
+    case 'login':
+      pageElement = <LoginPage onLogin={user => {
+        setUser(user);
+        if (user.group === 'admin') {
+          setPage('admin');
+        } else {
+          setPage('consent');
+        }
+        }} />;
+      break;
+    case 'consent':
+      pageElement = <ConsentPage onConsent={() => setPage('tutorial')} />;
+      break;
+    case 'tutorial':
+      pageElement = <TutorialPage group={user.group} onContinue={() => {
+        if (user.group === 'untrained') setPage('mainTasks');
+        else setPage('practice');
+        }} />;
+      break;
+    case 'practice':
+      pageElement = <PracticePage group={user.group} onComplete={() => {
+        if (user.group === 'expert') setPage('strategy');
+        else setPage('mainTasks');
+        }} />;
+      break;
+    case 'strategy':
+      pageElement = <StrategyPage onContinue={() => setPage('mainTasks')} />;
+      break;
+    case 'mainTasks':
+      pageElement = <MainTasksPage user={user} onComplete={() => setPage('feedback')} />;
+      break;
+    case 'feedback':
+      pageElement = <FeedbackPage user={user} onSubmit={() => setPage('end')} />;
+      break;
+    case 'end':
+      pageElement = <EndPage />;
+      break;
+    case 'admin':
+      pageElement = <AdminPage onLogout={() => { setUser(null); setPage('login'); }} />;
+      break;
+  }
+
+
   return (
     <>
       {showHero && (
         <>
-          <div
-            className="hero-bg"
-            style={{
-              background: `url(${process.env.PUBLIC_URL}/hero.jpg) center/cover no-repeat`
-            }}
-          />
+          <div className="hero-bg" />
           <div className="overlay" />
         </>
       )}
@@ -46,49 +87,11 @@ function App() {
             {showHero ? (
               <div className="hero-content">
                 {/* 页面内容 */}
-                {page === 'login' && (
-                  <LoginPage onLogin={user => {
-                    setUser(user);
-                    if (user.group === 'admin') {
-                      setPage('admin');
-                    } else {
-                      setPage('consent');
-                    }
-                  }} />
-                )}
-                {page === 'consent' && (
-                  <ConsentPage onConsent={() => setPage('tutorial')} />
-                )}
-                {page === 'tutorial' && (
-                  <TutorialPage group={user.group} onContinue={() => {
-                    if (user.group === 'untrained') setPage('mainTasks');
-                    else setPage('practice');
-                  }} />
-                )}
-                {page === 'practice' && (
-                  <PracticePage group={user.group} onComplete={() => {
-                    if (user.group === 'expert') setPage('strategy');
-                    else setPage('mainTasks');
-                  }} />
-                )}
-                {page === 'strategy' && (
-                  <StrategyPage onContinue={() => setPage('mainTasks')} />
-                )}
+                {pageElement}
               </div>
             ) : (
               // mainTasks及之后直接用卡片风格
-              <>
-                {page === 'mainTasks' && (
-                  <MainTasksPage user={user} onComplete={() => setPage('feedback')} />
-                )}
-                {page === 'feedback' && (
-                  <FeedbackPage user={user} onSubmit={() => setPage('end')} />
-                )}
-                {page === 'end' && <EndPage />}
-                {page === 'admin' && (
-                  <AdminPage onLogout={() => { setUser(null); setPage('login'); }} />
-                )}
-              </>
+              pageElement
             )}
           </div>
         </CSSTransition>

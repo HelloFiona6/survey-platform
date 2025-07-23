@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DotEstimationTask from '../components/DotEstimationTask';
 import SortByCountTask from '../components/SortByCountTask';
+import {backendUrl} from "../index";
 
 // export default function MainTasksPage({user, onComplete}) {
 //   let images = [
@@ -27,7 +28,7 @@ export default function MainTasksPage({ user, onComplete }) {
   // 获取任务题目
   useEffect(() => {
     // 假设后端返回 [{type: 'dots', image: ...}, {type: 'ranking', images: [...]}, ...]
-    fetch(`http://localhost:5000/api/main-tasks?user_id=${user.id}`)
+    fetch(new URL(`/api/main-tasks?user_id=${user.id}`, backendUrl))
       .then(res => res.json())
       .then(data => {
         setTasks(data);
@@ -38,7 +39,7 @@ export default function MainTasksPage({ user, onComplete }) {
   // 提交点数估计答案
   const handleDotSubmit = ({ answer, timeSpent, auto }) => {
     const task = tasks[current];
-    fetch('http://localhost:5000/api/response', {
+    fetch(new URL('/api/response',backendUrl), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -57,9 +58,9 @@ export default function MainTasksPage({ user, onComplete }) {
   // 提交图片排序答案
   const handleRankingSubmit = (order) => {
     const task = tasks[current];
-    fetch('http://localhost:5000/api/response', {
+    fetch(new URL('/api/response', backendUrl), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: user.id,
         question_id: task.id,

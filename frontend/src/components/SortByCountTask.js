@@ -12,7 +12,6 @@ import BubbleProgressBar from "./BubbleProgressBar";
  * @param props.total
  * @param props.current
  * @param props.title
- * @returns {JSX.Element}
  * @constructor
  */
 function SortByCountTask({
@@ -79,7 +78,7 @@ function SortByCountTask({
           <button onClick={() => handleSubmit(false)}>Submit</button>
         </div>
       </>) : (
-      <div id={"time-up-banner"}>submitted, wait for processing... </div>
+      <div id={"submitted-banner"}>submitted, wait for processing... </div>
     )}
   </div>
 }

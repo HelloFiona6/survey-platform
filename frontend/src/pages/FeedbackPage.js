@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import {backendUrl} from "../index";
 
 export default function FeedbackPage({ user, onSubmit }) {
   const [confidence, setConfidence] = useState('');
@@ -13,7 +14,7 @@ export default function FeedbackPage({ user, onSubmit }) {
     }
     setError('');
     // Submit feedback to backend
-    await fetch('http://localhost:5000/api/feedback', {
+    await fetch(new URL('/api/feedback', backendUrl), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

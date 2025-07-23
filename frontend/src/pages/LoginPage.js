@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import {backendUrl} from "../index";
 
 export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -12,7 +13,7 @@ export default function LoginPage({ onLogin }) {
     }
     setError('');
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
+      const res = await fetch(new URL('/api/login', backendUrl), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

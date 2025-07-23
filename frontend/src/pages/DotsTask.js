@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {backendUrl} from "../index";
 
 function DotsTask({ user, onBack }) {
   const [questions, setQuestions] = useState([]);
@@ -8,10 +9,10 @@ function DotsTask({ user, onBack }) {
   const [loading, setLoading] = useState(true);
   const [finished, setFinished] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const timerRef = useRef();
+  const timerRef = useRef(-1);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/dots-questions?count=10')
+    fetch(new URL('/api/dots-questions?count=10', backendUrl))
       .then(res => res.json())
       .then(data => {
         setQuestions(data);
@@ -40,7 +41,7 @@ function DotsTask({ user, onBack }) {
   const handleSubmit = async (answer, timeSpent) => {
     setSubmitting(true);
     const q = questions[current];
-    await fetch('http://localhost:5000/api/response', {
+    await fetch(new URL('/api/response', backendUrl), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -78,7 +79,7 @@ function DotsTask({ user, onBack }) {
   let imgSrc = '';
   try {
     const params = JSON.parse(q.params);
-    imgSrc = params.img ? `http://localhost:5000/images/${params.img}` : '';
+    imgSrc = params.img ? `${backendUrl}/images/${params.img}` : '';
   } catch {}
   return (
     <div className="App">

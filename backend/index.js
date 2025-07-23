@@ -11,6 +11,9 @@ const fs = require('fs');
 const path = require('path');
 const imagesDir = path.join(__dirname, 'images');
 
+const PORT = 5000;
+const BACKEND_DOMAIN = "http://localhost";
+
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.get('/', (req, res) => {
@@ -139,7 +142,7 @@ app.get('/api/main-tasks', (req, res) => {
         let distribution = '';
         try {
           const params = JSON.parse(row.params);
-          img = params.img ? `http://localhost:5000/images/${params.img}` : '';
+          img = params.img ? `${BACKEND_DOMAIN}:${PORT}/images/${params.img}` : '';
           distribution = params.distribution || '';
         } catch {}
         return {
@@ -199,7 +202,6 @@ function initQuestionsFromImages() {
 // 在服务启动时自动插入
 initQuestionsFromImages();
 
-const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

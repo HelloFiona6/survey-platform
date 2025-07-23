@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {backendUrl} from "../index";
 
 const SIDEBAR_WIDTH = 220;
 
@@ -47,10 +48,10 @@ export default function AdminPage({ onLogout }) {
 
   // Load users and responses
   const loadUsers = () => {
-    fetch('http://localhost:5000/api/users').then(r => r.json()).then(setUsers);
+    fetch(new URL('/api/users', backendUrl)).then(r => r.json()).then(setUsers);
   };
   const loadResponses = () => {
-    fetch('http://localhost:5000/api/responses').then(r => r.json()).then(setResponses);
+    fetch(new URL('/api/responses', backendUrl)).then(r => r.json()).then(setResponses);
   };
   useEffect(() => { loadUsers(); loadResponses(); }, []);
 
@@ -60,7 +61,7 @@ export default function AdminPage({ onLogout }) {
       setError('All fields required'); return;
     }
     setError('');
-    const res = await fetch('http://localhost:5000/api/user', {
+    const res = await fetch(new URL('/api/user', backendUrl), {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(newUser)
     });
@@ -75,7 +76,7 @@ export default function AdminPage({ onLogout }) {
   // Delete user
   const handleDeleteUser = async (id) => {
     if (!window.confirm('Delete this user?')) return;
-    await fetch(`http://localhost:5000/api/user/${id}`, { method: 'DELETE' });
+    await fetch(new URL(`/api/user/${id}`, backendUrl), { method: 'DELETE' });
     loadUsers();
   };
 
@@ -84,7 +85,7 @@ export default function AdminPage({ onLogout }) {
   const handleUpdateUser = async () => {
     if (!editUser.password || !editUser.group) { setError('All fields required'); return; }
     setError('');
-    await fetch(`http://localhost:5000/api/user/${editUser.id}`, {
+    await fetch(new URL(`/api/user/${editUser.id}`, backendUrl), {
       method: 'PUT', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: editUser.password, group: editUser.group, email: editUser.email })
     });

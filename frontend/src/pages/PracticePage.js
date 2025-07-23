@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import {backendUrl} from "../index";
 
 export default function PracticePage({ group, onComplete }) {
   const [questions, setQuestions] = useState([]);
@@ -9,10 +10,10 @@ export default function PracticePage({ group, onComplete }) {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const timerRef = useRef();
+  const timerRef = useRef(-1);
 
   useEffect(() => {
-    fetch(`http://localhost:5000/api/practice-questions?group=${group}`)
+    fetch(new URL(`/api/practice-questions?group=${group}`, backendUrl))
       .then(res => res.json())
       .then(data => {
         setQuestions(data);
@@ -73,7 +74,7 @@ export default function PracticePage({ group, onComplete }) {
   let imgSrc = '';
   try {
     const params = JSON.parse(q.params);
-    imgSrc = params.img ? `http://localhost:5000/images/${params.img}` : '';
+    imgSrc = params.img ? new URL(`/images/${params.img}`, backendUrl) : '';
   } catch {}
   return (
     <div className="App">

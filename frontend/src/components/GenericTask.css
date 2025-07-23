@@ -1,6 +1,6 @@
 #task-container {
-  position: relative;,
-  maxWidth: 600;
+  position: relative;
+  max-width: 600px;
   margin: 0 auto;
   padding: 0 0 2.5em 0;
 }
@@ -88,7 +88,7 @@
   border: none
 }
 
-#task-container .time-up-banner {
+#task-container .submitted-banner {
   text-align: center;
   margin: 2em 0;
   color: #888;

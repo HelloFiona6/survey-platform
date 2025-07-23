@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import BubbleProgressBar from './BubbleProgressBar';
+import './GenericTask.css'
 
 export default function DotEstimationTask({
   image, filename, distribution, onSubmit,
@@ -8,8 +9,8 @@ export default function DotEstimationTask({
   const [input, setInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [showInfo, setShowInfo] = useState(false);
-  const timerRef = useRef();
-  const inputRef = useRef();
+  const timerRef = useRef(-1);
+  const inputRef = useRef(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [timeUp, setTimeUp] = useState(false);
 
@@ -43,58 +44,22 @@ export default function DotEstimationTask({
   };
 
   return (
-    <div style={{ position: 'relative', maxWidth: 600, margin: '0 auto', padding: '0 0 2.5em 0' }}>
+    <div id={"task-container"}>
       {/* 标题 */}
-      <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 8, letterSpacing: -1 }}>{title}</div>
+      <div className={"title"}>{title}</div>
       {/* 进度条 */}
       <BubbleProgressBar total={total} current={current} />
       {/* 倒计时在图片外部右上角 */}
-      <div style={{
-        position: 'absolute', top: 18, right: 18, zIndex: 10,
-        background: '#fff', color: '#0071e3', borderRadius: 14,
-        padding: '4px 20px', fontWeight: 700, fontSize: 22,
-        boxShadow: '0 2px 8px #0001', border: '2px solid #e0e0e0',
-        minWidth: 70, textAlign: 'center', letterSpacing: 1
-      }}>{timeLeft}s</div>
+      <div id={"timer"}>{timeLeft}s</div>
       {/* info icon */}
-      <div style={{ position: 'fixed', left: 24, bottom: 24, zIndex: 100 }}>
+      <div className={"info"}>
         <span
-          style={{
-            display: 'inline-block',
-            width: 32,
-            height: 32,
-            borderRadius: '50%',
-            background: '#f5f6fa',
-            color: '#0071e3',
-            fontWeight: 700,
-            fontSize: 20,
-            textAlign: 'center',
-            lineHeight: '32px',
-            boxShadow: '0 2px 8px #0001',
-            cursor: 'pointer',
-            userSelect: 'none',
-            border: '2px solid #e0e0e0',
-          }}
+          className={"icon"}
           title="Show image info"
           onClick={() => setShowInfo(v => !v)}
         >i</span>
         {showInfo && (
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 38,
-              left: 0,
-              minWidth: 180,
-              background: '#fff',
-              color: '#222',
-              borderRadius: 10,
-              boxShadow: '0 4px 16px #0002',
-              padding: '1em',
-              fontSize: 15,
-              zIndex: 100,
-              textAlign: 'left',
-            }}
-          >
+          <div className={"popup"}>
             <div style={{ fontWeight: 600, marginBottom: 6 }}>Image Info</div>
             <div><b>Filename:</b> {filename || 'N/A'}</div>
             {distribution && <div><b>Distribution:</b> {distribution}</div>}
@@ -109,7 +74,7 @@ export default function DotEstimationTask({
               <img src={image} alt="dots" style={{ maxWidth: 420, maxHeight: 420, border: '1.5px solid #ccc', borderRadius: 16, boxShadow: '0 4px 24px #0001' }} />
             </div>
           )}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+          <div className={"form"}>
             {timeUp && (
               <div style={{ color: '#0071e3', fontSize: 18, marginBottom: 8, fontWeight: 500 }}>
                 Time is up, but you can still submit your answer
@@ -128,12 +93,22 @@ export default function DotEstimationTask({
               }}
               style={{ margin: '1em 0', width: 160, fontSize: 18, borderRadius: 10, padding: '0.7em 1em', border: '1.5px solid #e0e0e0', boxShadow: '0 2px 8px #0001' }}
             />
-            <button onClick={() => handleSubmit(false)} style={{ width: 180, fontSize: 18, borderRadius: 10, padding: '0.7em 0', boxShadow: '0 2px 8px #0071e355', background: '#0071e3', color: '#fff', fontWeight: 700, border: 'none' }}>Submit</button>
+            <button onClick={
+              () => {
+                const str = inputRef.current.value;
+                if (str.trim() === '' || isNaN(Number(str))) {
+                    alert('Please enter a number');
+                }
+                else {
+                    handleSubmit(false);
+                }
+              }
+            } >Submit</button>
           </div>
         </>
       )}
       {isSubmitted && (
-        <div style={{textAlign:'center',margin:'2em 0',color:'#888',fontSize:20,fontWeight:500}}>submitted, wait for processing...</div>
+        <div className={"submitted-banner"}>submitted, wait for processing...</div>
       )}
     </div>
   );
