@@ -44,19 +44,27 @@ app.post('/api/login', (req, res) => {
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required.' });
   }
-  db.get('SELECT * FROM users WHERE username = ? AND password = ?', [username, password], (err, user) => {
-    if (err) return res.status(500).json({ error: 'Database error.' });
-    if (!user) return res.status(401).json({ error: 'Invalid username or password.' });
-    res.json({ id: user.id, username: user.username, group: user.group });
-  });
+  db.get(
+    'SELECT * FROM users WHERE username = ? AND password = ?',
+    [username, password],
+    (err, user) => {
+      if (err) return res.status(500).json({ error: 'Database error.' });
+      if (!user) return res.status(401).json({ error: 'Invalid username or password.' });
+      res.json({ id: user.id, username: user.username, group: user.group });
+    }
+  );
 });
 
 // 管理员端：获取所有用户
 app.get('/api/users', (req, res) => {
-  db.all('SELECT id, username, "group", created_at FROM users', [], (err, rows) => {
-    if (err) return res.status(500).json({ error: 'Database error.' });
-    res.json(rows);
-  });
+  db.all(
+    'SELECT id, username, "group", created_at FROM users',
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Database error.' });
+      res.json(rows);
+    }
+  );
 });
 
 // 管理员端：增删改查用户
@@ -65,33 +73,49 @@ app.post('/api/user', (req, res) => {
   if (!username || !password || !group) {
     return res.status(400).json({ error: 'Missing fields.' });
   }
-  db.run('INSERT INTO users (username, password, "group") VALUES (?, ?, ?)', [username, password, group], function(err) {
-    if (err) return res.status(500).json({ error: 'Database error.' });
-    res.json({ id: this.lastID });
-  });
+  db.run(
+    'INSERT INTO users (username, password, "group") VALUES (?, ?, ?)',
+    [username, password, group],
+    function (err) {
+      if (err) return res.status(500).json({ error: 'Database error.' });
+      res.json({ id: this.lastID });
+    }
+  );
 });
 
 app.put('/api/user/:id', (req, res) => {
   const { password, group } = req.body;
-  db.run('UPDATE users SET password = ?, "group" = ? WHERE id = ?', [password, group, req.params.id], function(err) {
-    if (err) return res.status(500).json({ error: 'Database error.' });
-    res.json({ changes: this.changes });
-  });
+  db.run(
+    'UPDATE users SET password = ?, "group" = ? WHERE id = ?',
+    [password, group, req.params.id],
+    function(err) {
+      if (err) return res.status(500).json({ error: 'Database error.' });
+      res.json({ changes: this.changes });
+    }
+  );
 });
 
 app.delete('/api/user/:id', (req, res) => {
-  db.run('DELETE FROM users WHERE id = ?', [req.params.id], function(err) {
-    if (err) return res.status(500).json({ error: 'Database error.' });
-    res.json({ changes: this.changes });
-  });
+  db.run(
+    'DELETE FROM users WHERE id = ?',
+    [req.params.id],
+    function(err) {
+      if (err) return res.status(500).json({ error: 'Database error.' });
+      res.json({ changes: this.changes });
+    }
+  );
 });
 
 // 管理员端：查询所有作答情况
 app.get('/api/responses', (req, res) => {
-  db.all(`SELECT responses.*, users.username, users.group FROM responses LEFT JOIN users ON responses.user_id = users.id`, [], (err, rows) => {
-    if (err) return res.status(500).json({ error: 'Database error.' });
-    res.json(rows);
-  });
+  db.all(
+    `SELECT responses.*, users.username, users.group FROM responses LEFT JOIN users ON responses.user_id = users.id`,
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: 'Database error.' });
+      res.json(rows);
+    }
+  );
 });
 
 // 获取Dots题目
@@ -162,7 +186,6 @@ function initQuestionsFromImages() {
     /\.(png|jpg|jpeg|gif)$/i.test(f)
   );
   let pending = files.length;
-  if (pending === 0) return;
   files.forEach((img) => {
     db.get(
       "SELECT id FROM questions WHERE params = ?",
@@ -187,12 +210,10 @@ function initQuestionsFromImages() {
               } else {
                 console.log(`Inserted question for image: ${img}`);
               }
-              if (--pending === 0) return;
             }
           );
         } else {
           console.log(`Question for image ${img} already exists.`);
-          if (--pending === 0) return;
         }
       }
     );

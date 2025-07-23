@@ -30,12 +30,7 @@ files.forEach((img) => {
       if (!row) {
         db.run(
           "INSERT INTO questions (type, params, correct, strategy) VALUES (?, ?, ?, ?)",
-          [
-            "dots",
-            JSON.stringify({ img }),
-            "", // correct 答案可后续补充
-            null
-          ],
+          ["dots", JSON.stringify({ img }), ""/* correct 答案可后续补充 */, null],
           function (err) {
             if (err) {
               console.error(err);
