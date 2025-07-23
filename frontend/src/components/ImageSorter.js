@@ -8,9 +8,10 @@ import './ImageSorter.css'
  * position and a grayed-out image at the new hovered position.
  *
  * @param {Object} props - The component props.
- * @param {Object[]} props.images - An array of {id, src, alt} objects
+ * @param {{id:String, src:String, alt:String}[]} props.images - An array of image representations
+ * @param {Function} props.informParent - A (images)=>void hook to update sorting results upwards
  */
-function ImageSorter({images}) {
+function ImageSorter({images,informParent}) {
   const [imageList, setImageList] = useState(images);  // current order of images
   const [draggingImageId, setDraggingImageId] = useState(null);
 
@@ -74,6 +75,7 @@ function ImageSorter({images}) {
     newImageList.splice(hoveredOverDisplayIndex.current, 0, draggedContent);
 
     setImageList(newImageList); // Update the actual image list state
+    informParent(imageList)  // TODO cost too much?
 
     // Reset all drag-related states/refs
     setDraggingImageId(null);

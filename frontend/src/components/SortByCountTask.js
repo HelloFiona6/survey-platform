@@ -6,7 +6,7 @@ import BubbleProgressBar from "./BubbleProgressBar";
  * Sort images by dot numbers ascending, uses ImageSorter, adds submission and timer.
  *
  * @param {Object} props
- * @param {Object[]} props.images passed to ImageSorter
+ * @param {{id:String, src:String, alt:String}[]} props.images passed to ImageSorter
  * @param {function(Number[]): void} props.onSubmit callback for answer
  * @param {Number} props.timeLimit assume positive
  * @param props.total
@@ -18,13 +18,12 @@ import BubbleProgressBar from "./BubbleProgressBar";
 function SortByCountTask({
   images, onSubmit, timeLimit=30, total=1, current=1, title="Sort the images by number of dots ascending"
 }) {
-  const [input, setInput] = useState('');
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [showInfo, setShowInfo] = useState(false);
-  const timerRef = useRef(-1);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [timeUp, setTimeUp] = useState(false);
 
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
+  const timerRef = useRef(-1);
+  const [timeUp, setTimeUp] = useState(false);
   useEffect(() => {
     setTimeLeft(timeLimit);
     setIsSubmitted(false);
@@ -42,15 +41,16 @@ function SortByCountTask({
     }, 1000);
     return () => clearInterval(timerRef.current);
     // eslint-disable-next-line
-  }, [image]);
+  }, [images]);
 
+  const imagesRetVal = useRef(images)
   const handleSubmit = (auto = false) => {
     if (isSubmitted) return; // 防止多次提交
     clearInterval(timerRef.current);
     setIsSubmitted(true);
     setTimeUp(false);
-    onSubmit({ answer: input, timeSpent: timeLimit - timeLeft, auto });
-    setInput('');
+    const imageIds = images.map(I => I.id);
+    onSubmit(imagesRetVal.current.map(I=>imageIds.indexOf(I.id)));
   };
 
 
@@ -69,7 +69,7 @@ function SortByCountTask({
     </div>
     {!isSubmitted ? (
       <>
-        <ImageSorter images={images}/>
+        <ImageSorter images={images} informParent={images => imagesRetVal.current=images}/>
         <div className={"form"}>
           {timeUp && (
             <div className={"notice"}>

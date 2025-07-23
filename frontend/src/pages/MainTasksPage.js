@@ -100,7 +100,7 @@ export default function MainTasksPage({ user, onComplete }) {
     // TODO images should be Array<Object>, need API wrangling
     return (
       <SortByCountTask
-        images={task.images}
+        images={[{id:"I1", src:task.image, alt:"image"}]}
         onSubmit={handleRankingSubmit}
         timeLimit={30}
       />
