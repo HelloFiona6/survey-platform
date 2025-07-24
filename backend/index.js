@@ -1,12 +1,11 @@
 // backend/index.js
+const { exit } = require('process');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
 
 const db = require('./db');
-const runMigrations = require('./migrate');
-const { exit } = require('process');
 
 const imagesDir = path.join(__dirname, 'images');
 const PORT = 5000;
@@ -159,7 +158,7 @@ app.post('/api/response', (req, res) => {
   );
 });
 
-// 获取主任务题目（仅点数估计题）
+/* // 获取主任务题目（仅点数估计题）
 app.get('/api/main-tasks', (req, res) => {
   const userId = req.query.user_id;
   // 这里只返回 type 为 dots 的题目，image 字段为图片URL
@@ -187,7 +186,7 @@ app.get('/api/main-tasks', (req, res) => {
       res.json(tasks);
     }
   );
-});
+}); */
 
 /**
  * 获取默认任务题目
@@ -252,7 +251,7 @@ app.get('/api/main-tasks', (req, res) => {
 })
 
 // 在服务启动时自动插入
-initQuestionsFromImages(db);
+require('./register_images')(db);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
