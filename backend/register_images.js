@@ -6,7 +6,7 @@ const imagesDir = path.join(__dirname, 'images');
 
 
 /**
- * 
+ * Encapsulate CSV
  * @param {String} fileName 
  * @returns {Promise<Object[]>}
  */
@@ -88,6 +88,7 @@ async function initQuestionsFromImages(db) {
     }
   });
 }
+
 
 module.exports = function (db){
   initQuestionsFromImages(db)
