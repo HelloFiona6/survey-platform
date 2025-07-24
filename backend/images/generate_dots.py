@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 continue
 
             existing_locations.append(new_location)
-            plt.plot(*new_location, 'ko', markersize=DOT_SEP*100, markeredgewidth=0)
+            plt.plot(*new_location, 'ko', markersize=min(args.DOT_SEP*180,5), markeredgewidth=0)
 
         axes = plt.gca()
         axes.set_xlim([-0.05,1.05])

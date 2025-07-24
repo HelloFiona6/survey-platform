@@ -40,7 +40,7 @@ def refresh_index():
     valid_rows = []
     with open(INDEX_FILE, newline='') as csvfile:
         reader = csv.DictReader(csvfile, fieldnames=CSV_HEADER)
-        for row in reader:
+        for row in reader:  # the headers will also be read, but not fix it now. it prevents name conflicts anyway.
             filename = row[FILENAME_KEY]
             if os.path.isfile(filename):
                 valid_rows.append(row)
