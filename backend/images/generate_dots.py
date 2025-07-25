@@ -16,10 +16,55 @@ DOT_SEP = 0.03  # don't overlap
 PATH = '.'
 DISTRIBUTION = 'uniform'
 
+
+class UniformSampler:
+    def __call__(self):
+        return np.random.uniform(0, 1, 2)
+
+
+class NormalSampler:
+    def __call__(self):
+        return np.random.normal(0.5, 0.2, 2)
+
+
+class QuarterSampler:
+    def __call__(self):
+        return np.random.normal((np.random.randint(0, 2, 2) + 0.5) / 2, 0.1)
+
+
+class UnevenDoubleSampler:
+    def __init__(self):
+        self.p = np.random.randint(2, 8) / 10  # randomize the unevenness
+        self.centers = np.random.beta(0.6, 0.6, (2, 2)) * 0.4 + 0.3  # centers in [0.3, 0.7] range
+
+    def __call__(self):
+        cluster_index = 0 if np.random.rand() < self.p else 1
+        return np.random.normal(self.centers[cluster_index], 0.1)
+
+
+class MoonSampler:
+    centers = np.array([0.5, 0.5])
+
+    def __init__(self):
+        phi = np.random.uniform(0, 2 * np.pi)
+        self.rotation = np.array([
+            [np.cos(phi), -np.sin(phi)],
+            [np.sin(phi), np.cos(phi)]
+        ])
+
+    def __call__(self):
+        theta = np.random.uniform(-np.pi, np.pi)
+        vec = np.array([np.cos(theta), np.sin(theta)]) * 0.25
+        base = np.array([-0.13 if theta < 0 else 0.13, 0])
+        return MoonSampler.centers + np.random.normal(base + vec, 0.05) @ self.rotation
+
+
 DOT_SAMPLERS = {
-    'uniform': lambda: np.random.uniform(0, 1, 2),
-    'normal': lambda: np.random.normal(0.5, 0.2, 2),
-    'quarter': lambda: np.random.normal((np.random.randint(0, 2, 2)+0.5)/2, 0.1),
+    'uniform': UniformSampler,
+    'normal': NormalSampler,
+    'quarter': QuarterSampler,
+    'uneven2': UnevenDoubleSampler,
+    'moon': MoonSampler,
 }
 
 parser = argparse.ArgumentParser(description="Generate dot images with customizable parameters.")
@@ -45,7 +90,7 @@ parser.add_argument(
     type=str,
     dest="PATH",
     default=PATH,
-    help='The directory path where the generated images will be saved. '
+    help='The existing directory path where the generated images will be saved. '
          'Defaults to the current directory.'
 )
 parser.add_argument(
@@ -61,7 +106,6 @@ parser.add_argument(
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    # os.makedirs(args.PATH, exist_ok=True)
     sampler_name = args.DISTRIBUTION
     init_index()
     for n_dots in args.DOT_NUMBERS:
@@ -70,8 +114,9 @@ if __name__ == "__main__":
 
         #add each dot
         plt.clf()
+        sampler = DOT_SAMPLERS[sampler_name]()  # actually, it's a callable object, not a function.
         while len(existing_locations) != n_dots:
-            new_location = DOT_SAMPLERS[sampler_name]()
+            new_location = sampler()
             if not np.all((0 < new_location) & (new_location < 1)):
                 continue
 
@@ -81,8 +126,8 @@ if __name__ == "__main__":
                 continue
 
             existing_locations.append(new_location)
-            plt.plot(*new_location, 'ko', markersize=min(args.DOT_SEP*180,5), markeredgewidth=0)
 
+        plt.plot(*zip(*existing_locations), 'ko', markersize=min(args.DOT_SEP * 180, 5), markeredgewidth=0)
         axes = plt.gca()
         axes.set_xlim([-0.05,1.05])
         axes.set_ylim([-0.05,1.05])
