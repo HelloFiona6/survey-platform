@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS graph_material(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   location TEXT NOT NULL, -- filename / URI
   usage TEXT,
-  extra TEXT, -- optinal attributes
+  extra TEXT -- optional attributes
 );
 
 CREATE TABLE IF NOT EXISTS questions (
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS question_material(
   material_id INTEGER NOT NULL,
   role TEXT, -- NULL for dot counting and MST marking.
   PRIMARY KEY (question_id, material_id),
-  FOREIGN KEY(question_id) REFERENCES questions(id)
+  FOREIGN KEY(question_id) REFERENCES questions(id),
   FOREIGN KEY(material_id) REFERENCES dot_material(id) ON DELETE CASCADE
 );
 
