@@ -1,22 +1,28 @@
 // backend/index.js
-const { exit } = require('process');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
+const SurveyDB = require('./db'); // Adjust the path as necessary
 
-const db = require('./db');
 
 const imagesDir = path.join(__dirname, 'images');
 const PORT = 5000;
 const BACKEND_DOMAIN = "http://localhost";
 
+(async function () {
+
+const db = new SurveyDB();
+await db.migrateAsync();
 if (!db.is_fine()) {
   console.error('Database is not fine, exiting...');
   db.close();
-  exit(1);
+  process.exit(1);
 }
 // Ensures db is open and migrated
+
+// 在服务启动时自动插入
+await require('./register_images').init(db);
 
 const app = express();
 app.use(cors());
@@ -194,7 +200,7 @@ app.get('/api/main-tasks', (req, res) => {
  */
 app.get('/api/main-tasks', (req, res) => {
   const userId = req.query.user_id;
-  // Does SQLite has predicate/selection pushdown?
+  // Does SQLite have predicate/selection pushdown?
   const sql = `
     WITH T AS (
       SELECT id FROM tasks
@@ -250,9 +256,9 @@ app.get('/api/main-tasks', (req, res) => {
   );
 })
 
-// 在服务启动时自动插入
-require('./register_images')(db);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+})();

@@ -19,10 +19,17 @@ async function runMigrations(db) {
 
     // 2. Get applied migrations
     const appliedMigrations = new Set(
-      db
-      .all("SELECT migration_name FROM _migrations ORDER BY id ASC")
-      .map(row => row.migration_name)
-      );
+      await new Promise((resolve, reject) => {
+        db.all(
+          "SELECT migration_name FROM _migrations ORDER BY applied_at",
+          [],
+          (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows.map(row => row.migration_name));
+          }
+        );
+      })
+    );
     console.log('Applied migrations:', [...appliedMigrations]);
 
     // 3. Read migration files
@@ -60,4 +67,6 @@ async function runMigrations(db) {
   }
 }
 
-module.exports = runMigrations;
+module.exports = {
+  run: runMigrations
+};
