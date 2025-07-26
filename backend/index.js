@@ -2,19 +2,20 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const path = require('path');
-const SurveyDB = require('./db'); // Adjust the path as necessary
 
+const SurveyDB = require('./db');
+const imageRegistration = require('./register_images');
 
-const imagesDir = path.join(__dirname, 'images');
+const imagesDir = imageRegistration.imagesDir;
 const PORT = 5000;
 const BACKEND_DOMAIN = "http://localhost";
 
+// entry point for the backend server
 (async function () {
 
 const db = new SurveyDB();
 await db.migrateAsync();
-if (!db.is_fine()) {
+if (!await db.is_fine()) {
   console.error('Database is not fine, exiting...');
   db.close();
   process.exit(1);
@@ -22,7 +23,7 @@ if (!db.is_fine()) {
 // Ensures db is open and migrated
 
 // 在服务启动时自动插入
-await require('./register_images').init(db);
+await imageRegistration.init(db);
 
 const app = express();
 app.use(cors());
@@ -199,36 +200,36 @@ app.get('/api/main-tasks', (req, res) => {
  * 单个SQL查询，找出所有符合给定 用户ID、任务阶段、题目类型 的题目
  */
 app.get('/api/main-tasks', (req, res) => {
-  const userId = req.query.user_id;
   // Does SQLite have predicate/selection pushdown?
   const sql = `
     WITH T AS (
       SELECT id FROM tasks
       WHERE 
         "group" IN (
-          SELECT "group" FROM user WHERE user_id = ?
-        ) AND type = ?
+          SELECT "group" FROM users WHERE users.id = ?
+        ) AND tasks.type = ?
     ),
     Q AS (
-      SELECT question.type, question_id
+      SELECT questions.type as type, question_id
       FROM
         T 
         JOIN task_question ON T.id = task_question.task_id
-        JOIN question ON question.id = task_question.question_id
-      WHERE question.type = ?
+        JOIN questions ON questions.id = task_question.question_id
+      WHERE questions.type = ?
     )
     SELECT
-      TQ.question_id AS id,
-      TQ.type AS type,
+      Q.question_id AS id,
+      Q.type AS type,
       DM.location AS location,
       DM.distribution AS distribution
     FROM
       Q
-      JOIN question_material AS QM ON Q.id = QM.question_id
+      JOIN question_material AS QM ON Q.question_id = QM.question_id
       JOIN dot_material AS DM ON DM.id = QM.material_id
     ORDER BY RANDOM() LIMIT 10
   `;
   let tasks = [];
+  const userId = req.query.user_id;
   db.each(sql, [userId, 'test', 'dots'],  // defaults
     (err, row) => {  // rowCallback
       if (err) {

@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser'); // Ensure you have csv-parser installed
-const db = require('./db');
 
 const imagesDir = path.join(__dirname, 'images');
 
@@ -36,14 +35,19 @@ async function adaptIndex(dirName) {
   return entries
     .map(entry => {
       return {
-        location: path.join(dirName, entry['filename']),
+        distribution: entry['distribution'],
+        location: path.relative(imagesDir, path.join(dirName, entry['filename'])),
         dot_count: entry['dot_number'],
-        distribution: entry['distribution']
       };
     });
 }
 
-
+/**
+ * Find images in imagesDir and insert those whose location is absent.
+ * Currently, not use recursive search (though supported) to make it simple.
+ * @param {SurveyDB} db
+ * @returns {Promise<void>}
+ */
 async function initQuestionsFromImagesAsync(db) {
   // const filesAndDirs = await fs.promises.readdir(directoryPath, { withFileTypes: true });
   // const directories = filesAndDirs
@@ -62,23 +66,14 @@ async function initQuestionsFromImagesAsync(db) {
 
   try {
     await db.runAsync("BEGIN TRANSACTION");
-    const get_stmt = await db.prepareAsync("SELECT id FROM dot_material WHERE location = ?");
-
     for (const entry of results) {
-      get_stmt.run(entry.location, (err, row) => {
-        if (err) {
-          console.error(`Error checking material for ${entry.location}:`, err.message);
-          return;
-        }
-        if (row) {
-          console.log(`Dot material for ${entry.location} already exists.`);
-          return;
-        }
-        db.run("INSERT INTO dot_material (location, dot_count, distribution) VALUES (?, ?, ?)", ...entry);
-      });
+      if (await db.getAsync("SELECT id FROM dot_material WHERE location = ?", [entry.location])) {
+        console.log(`Dot material for ${entry.location} already exists.`);
+        continue;
+      }
+      await db.runAsync("INSERT INTO dot_material (location, dot_count, distribution) VALUES (?, ?, ?)", [entry.location, entry.dot_count, entry.distribution]);
     }
 
-    get_stmt.finalize();
     await db.runAsync("COMMIT");
   } catch (err){
     if (err) {
@@ -98,5 +93,6 @@ module.exports = {
     } catch (err) {
       console.error('Error initializing dot materials:', err.message);
     }
-  }
+  },
+  imagesDir: imagesDir
 };

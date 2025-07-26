@@ -27,7 +27,7 @@ def init_index():
 
 def append_index_row(filename: str, dot_number: int, distribution: str):
     with open(INDEX_FILE, 'a') as f:
-        writer = csv.DictWriter(f, CSV_HEADER)
+        writer = csv.DictWriter(f, CSV_HEADER, lineterminator='\n')
         writer.writerow({
             FILENAME_KEY: filename,
             GROUND_TRUTH_KEY: dot_number,

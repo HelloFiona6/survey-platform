@@ -14,19 +14,18 @@ class SurveyDB {
     });
   }
 
-  is_fine() {
-    let fine = true;
-    this.db.get('SELECT 1', (err, row) => {
-      if (err) {
-        fine = false;
-      }
+  async is_fine() {
+    return new Promise((resolve) => {
+      this.db.get('SELECT 1', (err, row) => {
+        resolve(!err);
+      });
     });
-    return fine;
   }
 
   run(sql, params = [], callBack=undefined) {    return this.db.run(sql, params, callBack);  }
   get(sql, params = [], callBack=undefined) {    return this.db.get(sql, params, callBack);  }
   all(sql, params = [], callBack=undefined) {    return this.db.all(sql, params, callBack);  }
+  each(sql, params, rowCallback, completeCallback) {    return this.db.each(sel, params, rowCallback, completeCallback);  }
   exec(sql, callBack=undefined) {    return this.db.exec(sql, callBack);  }
   close() {    return this.db.close();  }
 
