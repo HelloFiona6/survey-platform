@@ -165,36 +165,6 @@ app.post('/api/response', (req, res) => {
   );
 });
 
-/* // 获取主任务题目（仅点数估计题）
-app.get('/api/main-tasks', (req, res) => {
-  const userId = req.query.user_id;
-  // 这里只返回 type 为 dots 的题目，image 字段为图片URL
-  db.all(
-    'SELECT id, type, params FROM questions WHERE type = ? ORDER BY id limit 10',
-    ['dots'],
-    (err, rows) => {
-      if (err) return res.status(500).json({ error: 'Database error.' });
-      // params 字段中提取图片名，拼接为图片URL
-      const tasks = rows.map(row => {
-        let img = '';
-        let distribution = '';
-        try {
-          const params = JSON.parse(row.params);
-          img = params.img ? `${BACKEND_DOMAIN}:${PORT}/images/${params.img}` : '';
-          distribution = params.distribution || '';
-        } catch {}
-        return {
-          id: row.id,
-          type: row.type,
-          image: img,
-          distribution: distribution
-        };
-      });
-      res.json(tasks);
-    }
-  );
-}); */
-
 /**
  * 获取默认任务题目
  * 单个SQL查询，找出所有符合给定 用户ID、任务阶段、题目类型 的题目
