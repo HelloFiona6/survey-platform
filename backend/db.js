@@ -17,7 +17,7 @@ class SurveyDB {
   async is_fine() {
     return new Promise((resolve) => {
       this.db.get('SELECT 1', (err, row) => {
-        resolve(!err);
+        resolve(!err && row);
       });
     });
   }

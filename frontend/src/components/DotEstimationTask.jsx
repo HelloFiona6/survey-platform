@@ -4,7 +4,7 @@ import './GenericTask.css'
 
 export default function DotEstimationTask({
   image, filename, distribution, onSubmit,
-  timeLimit = 30, remaining, total, current, title = 'Estimate the number of dots'
+  timeLimit = 30, total, current, title = 'Estimate the number of dots'
 }) {
   const [input, setInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
