@@ -1,8 +1,9 @@
+/*
 const fs = require('fs');
 const path = require('path');
 
 const imagesDir = path.join(__dirname, 'images');
-/*
+/!*
 // 读取所有图片文件
 const files = fs.readdirSync(imagesDir).filter(f =>
   /\.(png|jpg|jpeg|gif)$/i.test(f)
@@ -45,7 +46,7 @@ files.forEach((img) => {
     }
   );
 });
-*/
+*!/
 
 let files = [];
 function initQuestionsFromImages(db) {
@@ -66,7 +67,7 @@ function initQuestionsFromImages(db) {
           db.run(
             "INSERT INTO questions (type, params, correct, strategy) VALUES (?, ?, ?, ?)",
             [
-              "dots",
+              "dot_count",
               JSON.stringify({ img }),
               "", // correct 答案可后续补充
               null
@@ -88,3 +89,4 @@ function initQuestionsFromImages(db) {
 }
 
 module.exports = initQuestionsFromImages;
+*/
