@@ -281,12 +281,15 @@ const BACKEND_DOMAIN = "http://localhost";
                      where users.id = ?)
     `;
     const userId = req.query.user_id;
-    const rows = await db.all(sql, [userId]);
+    let rows = await db.allAsync(sql, [userId]);
+    // rows = Array.from(rows);
     if (rows.length > 0) {
-      res.json(rows.sort((a, b) => (a === b ? 0 : (b === 'main' ? -1 : 1))));
+      rows.sort((a, b) => (a === b ? 0 : (b === 'main' ? -1 : 1)));
+      res.json(rows);
     } else {
-      res.status(404);
+      res.status(404).send();
     }
+    console.log(req.url, rows);
   })
 
   app.get('/api/dot-task', async (req, res) => {
@@ -310,13 +313,14 @@ const BACKEND_DOMAIN = "http://localhost";
     `;
     const userId = req.query.user_id;
     const task = req.query.task;
-    const rows = await db.all(sql, [userId, task]);
+    const rows = await db.allAsync(sql, [userId, task]);
     if (rows.length > 0) {
       res.json(rows);
     } else {
-      res.status(404);
+      res.status(404).send();
     }
-  })
+    console.log(req.url);
+  });
 
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

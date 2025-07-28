@@ -16,12 +16,14 @@ export default function PracticePage({group, onComplete}) {
     (async () => {
       try {
         const res = await fetch(new URL(`/api/practice-questions?group=${group}`, backendUrl));
-        if (!res.ok) {
+        if (res.ok && res.status === 200) {
+          const data = await res.json();
+          setQuestions(data);
+          setLoading(false);
+        } else {
           throw new Error('Backend error: ' + res.statusText);
+
         }
-        const data = await res.json();
-        setQuestions(data);
-        setLoading(false);
       } catch (err) {
         alert(err);  // includes those from res.json()
       }
@@ -89,6 +91,7 @@ export default function PracticePage({group, onComplete}) {
               type="number"
               placeholder="Estimate number of dots"
               value={input}
+              autoFocus={true}
               onChange={e => setInput(e.target.value)}
               disabled={submitting}
             />

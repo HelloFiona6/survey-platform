@@ -30,18 +30,19 @@ export default function MainTasksPage({user, task, onComplete}) {
     (async () => {
       // 假设后端返回 [{type: 'dots', image: ...}, {type: 'ranking', images: [...]}, ...]
       try {
-        const res = await fetch(new URL(`/api/dot-task?user_id=${user.id}&?task=${task}`, backendUrl));
-        if (!res.ok) {
+        const res = await fetch(new URL(`/api/dot-task?user_id=${user.id}&task=${task.id}`, backendUrl));
+        if (res.ok && res.status === 200) {
+          const data = await res.json();
+          setQuestions(data);
+          setLoading(false);
+        } else {
           throw new Error('Backend error: ' + res.statusText);
         }
-        const data = await res.json();
-        setQuestions(data);
-        setLoading(false);
       } catch (e) {
         alert(e);  // includes those from res.json()
       }
     })();
-  }, [user.id]);
+  }, [user.id, task]);
 
   // 提交点数估计答案
   const handleDotSubmit = ({answer, timeSpent, auto}) => {
