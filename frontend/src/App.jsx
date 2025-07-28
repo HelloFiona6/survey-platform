@@ -10,6 +10,7 @@ import FeedbackPage from './pages/FeedbackPage';
 import EndPage from './pages/EndPage';
 import AdminPage from './pages/AdminPage';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
+import {backendUrl} from "./index"
 
 function App() {
   const [page, setPage] = useState('login');
@@ -37,7 +38,17 @@ function App() {
       }}/>;
       break;
     case 'consent':
-      pageElement = <ConsentPage onConsent={() => setPage('tutorial')}/>;
+      pageElement = <ConsentPage onConsent={() => {
+        (async function () {
+          const res = await fetch(new URL(`/api/task-list?user_id=${user.id}`, backendUrl));
+          if (res.ok && res.status === 200) {
+            tasksRef.current = await res.json();
+            setPage('tutorial');
+          } else {
+            alert('Failed to fetch tasks, better to reload');
+          }
+        })();
+      }}/>;
       break;
     case 'tutorial':
       pageElement = <TutorialPage group={user.group} onContinue={() => {
@@ -48,8 +59,8 @@ function App() {
       break;
     case 'practice':
       pageElement = <PracticePage group={user.group} onComplete={() => {
-        if (currentTaskIndex + 1 < tasksRef.current.length) {
-          alert(`Only having ${tasksRef.current.length} tasks, but current task is ${currentTaskRef.current}`);
+        if (currentTaskIndex + 1 >= tasksRef.current.length) {
+          alert(`Only having ${tasksRef.current.length} tasks, but current task is NO.${currentTaskIndex}`);
           return;
         }
         setCurrentTaskIndex(x => x + 1);
@@ -60,7 +71,8 @@ function App() {
       }}/>;
       break;
     case 'mainTasks':
-      pageElement = <MainTasksPage user={user} onComplete={() => setPage('feedback')}/>;
+      pageElement =
+        <MainTasksPage user={user} task={tasksRef.current[currentTaskIndex]} onComplete={() => setPage('feedback')}/>;
       break;
     case 'strategy':
       pageElement = <StrategyPage onContinue={() => setPage('mainTasks')}/>;

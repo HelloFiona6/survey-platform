@@ -90,6 +90,7 @@ export default function DotEstimationTask({
               type="number"
               placeholder="Your estimate"
               value={input}
+              autoFocus={true}
               onChange={e => setInput(e.target.value)}
               ref={inputRef}
               onKeyDown={e => {
