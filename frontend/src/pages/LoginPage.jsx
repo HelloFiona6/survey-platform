@@ -37,14 +37,14 @@ export default function LoginPage({onLogin}) {
         placeholder="Username"
         value={username}
         onChange={e => setUsername(e.target.value)}
-        style={{width: '100%'}}
+        style={{width: '100%', boxSizing: 'border-box'}}
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={e => setPassword(e.target.value)}
-        style={{width: '100%', marginTop: '1em'}}
+        style={{width: '100%', boxSizing:"border-box", marginTop: '1em'}}
       />
       <button onClick={handleLogin} style={{width: '100%'}}>Login</button>
       {error && <div style={{color: 'red', marginTop: '1em'}}>{error}</div>}

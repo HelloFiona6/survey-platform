@@ -52,7 +52,7 @@ export default function DotEstimationTask({
       {/* 倒计时在图片外部右上角 */}
       <div id={"timer"}>{timeLeft}s</div>
       {/* info icon */}
-      <div className={"info"}>
+      <div id={"info"}>
         <span
           className={"icon"}
           title="Show image info"
