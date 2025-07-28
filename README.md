@@ -40,8 +40,16 @@ npm install
 
 ### 3.2 Database Initialization
 
-- **No manual steps required!**
-- The backend will automatically create and initialize the SQLite database (`survey.db`) and all tables on first run.
+Due to the complexity of experimental design details (like which images should be assigned to whom at which time), 
+for now we manually load questions and tasks into the database.
+
+- generate images under ./image folder using the Python script
+- in the database, edit and connect questions to images
+- edit tasks and assign questions to them
+
+The register_images module receives an existing database object and loads ./image information into it automatically.
+
+More SQL scripts or JS scripts will come to automate more works.
 
 ### 3.3 Start the Backend Server
 
@@ -113,5 +121,7 @@ From the `frontend/` directory:
 
 ## 9. Resetting the Database
 
-If you want to start with a fresh database, simply delete the `survey.db` file in the `backend/` directory and restart the backend server.
+The database indexes image resources strictly by file names. Resetting may be tricky.
+
+Luckily, we decouple questions and images, so modifications are limited in 2 tables.
 
