@@ -52,22 +52,24 @@ function App() {
       break;
     case 'tutorial':
       pageElement = <TutorialPage group={user.group} onContinue={() => {
-        setCurrentTaskIndex(x => 0);
+        setCurrentTaskIndex(0);
         if (user.group === 'untrained') setPage('mainTasks');
         else setPage('practice');
       }}/>;
       break;
     case 'practice':
       pageElement = <PracticePage group={user.group} onComplete={() => {
-        if (currentTaskIndex + 1 >= tasksRef.current.length) {
+        const nextIndex = currentTaskIndex + 1;
+        if (nextIndex >= tasksRef.current.length) {
           alert(`Only having ${tasksRef.current.length} tasks, but current task is NO.${currentTaskIndex}`);
           return;
         }
-        setCurrentTaskIndex(x => x + 1);
-        if (tasksRef.current[currentTaskIndex].type !== 'practice') {
+        if (tasksRef.current[nextIndex].type !== 'practice') {
           if (user.group === 'expert') setPage('strategy');
           else setPage('mainTasks');
         }
+        setCurrentTaskIndex(nextIndex);
+
       }}/>;
       break;
     case 'mainTasks':
@@ -79,8 +81,9 @@ function App() {
       break;
     case 'feedback':
       pageElement = <FeedbackPage user={user} task={tasksRef.current[currentTaskIndex]} onSubmit={() => {
-        if (currentTaskIndex + 1 < tasksRef.current.length) {
-          setCurrentTaskIndex(x => x + 1);
+        const nextIndex = currentTaskIndex + 1;
+        if (nextIndex < tasksRef.current.length) {
+          setCurrentTaskIndex(nextIndex);
           setPage('mainTasks')
         } else {
           setPage('end');

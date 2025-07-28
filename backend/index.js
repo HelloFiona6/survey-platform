@@ -305,7 +305,7 @@ const BACKEND_DOMAIN = "http://localhost";
     let rows = await db.allAsync(sql, [userId]);
     // rows = Array.from(rows);
     if (rows.length > 0) {
-      rows.sort((a, b) => (a === b ? 0 : (b === 'main' ? -1 : 1)));
+      rows.sort((a, b) => (a.type === b.type ? 0 : (b.type === 'main' ? -1 : 1)));
       res.json(rows);
     } else {
       res.status(404).send();
