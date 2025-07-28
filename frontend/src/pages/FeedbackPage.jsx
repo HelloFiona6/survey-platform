@@ -19,7 +19,7 @@ export default function FeedbackPage({user, task, onSubmit}) {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: user.id,
-        task,
+        task: task.id,
         confidence,
         preference,
         strategy,

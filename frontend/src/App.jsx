@@ -78,7 +78,7 @@ function App() {
       pageElement = <StrategyPage onContinue={() => setPage('mainTasks')}/>;
       break;
     case 'feedback':
-      pageElement = <FeedbackPage user={user} onSubmit={() => {
+      pageElement = <FeedbackPage user={user} task={tasksRef.current[currentTaskIndex]} onSubmit={() => {
         if (currentTaskIndex + 1 < tasksRef.current.length) {
           setCurrentTaskIndex(x => x + 1);
           setPage('mainTasks')

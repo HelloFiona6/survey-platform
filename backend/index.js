@@ -268,7 +268,28 @@ const BACKEND_DOMAIN = "http://localhost";
   });
 
   app.post('/api/feedback', async (req, res) => {
+    const sql = `INSERT INTO responses (user_id, question_id, response)
+                 VALUES (?,
+                         (SELECT q.id
+                          FROM task_question tq
+                                   JOIN questions q ON tq.question_id = q.id
+                          WHERE tq.task_id = ?
+                            AND q.type = 'feedback'
+                          limit 1),
+                         ?);`;
     const {user_id, confidence, preference, strategy, task} = req.body;
+    try {
+      const result = await db.runAsync(sql, [user_id, task, JSON.stringify({
+        preference: preference,
+        confidence: confidence,
+        strategy: strategy,
+      })]);
+      res.json({id: result.lastID});
+      console.log(req.url);
+    } catch (err) {
+      res.status(500).json({error: 'Database error.'});
+      console.error(req.url, err);
+    }
   });
 
   app.get('/api/task-list', async (req, res) => {
@@ -315,7 +336,12 @@ const BACKEND_DOMAIN = "http://localhost";
     const task = req.query.task;
     const rows = await db.allAsync(sql, [userId, task]);
     if (rows.length > 0) {
-      res.json(rows);
+      res.json(rows.map(row => ({
+        id: row.id,
+        type: row.type,
+        image: `${BACKEND_DOMAIN}:${PORT}/images/${row.src}`,
+        distribution: row.distribution
+      })));
     } else {
       res.status(404).send();
     }
