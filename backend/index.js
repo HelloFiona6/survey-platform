@@ -5,7 +5,6 @@ const bodyParser = require('body-parser');
 
 const SurveyDB = require('./db');
 const imageRegistration = require('./register_images');
-
 const imagesDir = imageRegistration.imagesDir;
 const PORT = 5000;
 const BACKEND_DOMAIN = "http://localhost";
@@ -137,7 +136,7 @@ app.get('/api/dots-questions', (req, res) => {
   const count = parseInt(req.query.count) || 10;
   db.all(
     'SELECT id, params, ground_truth, strategy, created_at FROM questions WHERE type = ? ORDER BY RANDOM() LIMIT ?',
-    ['dots', count],
+    ['dot_count', count],
     (err, rows) => {
       if (err) {
         return res.status(500).json({ error: 'Database error.' });
@@ -200,7 +199,7 @@ app.get('/api/main-tasks', (req, res) => {
   `;
   let tasks = [];
   const userId = req.query.user_id;
-  db.each(sql, [userId, 'test', 'dots'],  // defaults
+  db.each(sql, [userId, 'main', 'dot_count'],  // defaults
     (err, row) => {  // rowCallback
       if (err) {
         console.error('Error fetching row:', err.message);
@@ -225,8 +224,49 @@ app.get('/api/main-tasks', (req, res) => {
       console.log(`Sent ${count} dot counting tasks.`);
     }
   );
-})
+  console.log(req.url);
+});
 
+// for now, select a practice task and send all related questions.
+app.get('/api/practice-questions', async (req, res) => {
+  const group = req.query.group;
+  const sql = `
+    with T as (
+      select *
+      from tasks
+      where tasks."group" = ? and tasks.type = 'practice'
+      limit 1
+    ),
+    Q as (
+      select task_question.question_id
+      from T 
+        join task_question on T.id = task_question.task_id
+    )
+    SELECT Q.question_id qid, questions.type tp, questions.ground_truth gt, dot_material.location src, dot_material.distribution dist
+    FROM Q 
+      JOIN questions ON Q.question_id = questions.id
+      JOIN question_material ON questions.id = question_material.question_id
+      JOIN dot_material ON question_material.material_id = dot_material.id
+    `;
+  db.all(sql, [group], (err, rows) => {
+    if (err) {
+      console.error('Error fetching practice questions:', err.message);
+      return res.status(500).json({ error: 'Database error.' });
+    }
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No practice questions found.' });
+    }
+    const questions = rows.map(row => ({
+      id: row.qid,
+      type: row.tp,
+      answer: row.gt,
+      image: `${BACKEND_DOMAIN}:${PORT}/images/${row.src}`,  // can't use path.posix.join because of '://'
+      distribution: row.dist || ''
+    }));
+    res.json(questions);
+  })
+  console.log(req.url);
+})
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

@@ -26,14 +26,20 @@ export default function MainTasksPage({ user, onComplete }) {
   const [loading, setLoading] = useState(true);
 
   // 获取任务题目
-  useEffect(() => {
+  useEffect(() => {(async () => {
     // 假设后端返回 [{type: 'dots', image: ...}, {type: 'ranking', images: [...]}, ...]
-    fetch(new URL(`/api/main-tasks?user_id=${user.id}`, backendUrl))
-      .then(res => res.json())
-      .then(data => {
-        setTasks(data);
-        setLoading(false);
-      });
+    try {
+      const res = await fetch(new URL(`/api/main-tasks?user_id=${user.id}`, backendUrl));
+      if (!res.ok) {
+        throw new Error('Backend error: ' + res.statusText);
+      }
+      const data = await res.json();
+      setTasks(data);
+      setLoading(false);
+    } catch (e) {
+      alert(e);  // includes those from res.json()
+    }
+  })();
   }, [user.id]);
 
   // 提交点数估计答案
@@ -50,7 +56,7 @@ export default function MainTasksPage({ user, onComplete }) {
         correct: null,
         time_spent: timeSpent,
       }),
-    });
+    }).catch(e => alert(e));
     if (current + 1 < tasks.length) setCurrent(current + 1);
     else onComplete();
   };
@@ -69,7 +75,7 @@ export default function MainTasksPage({ user, onComplete }) {
         correct: null,
         time_spent: null,
       }),
-    });
+    }).catch(e => alert(e));
     if (current + 1 < tasks.length) setCurrent(current + 1);
     else onComplete();
   };
@@ -78,7 +84,7 @@ export default function MainTasksPage({ user, onComplete }) {
   if (!tasks.length) return <div>No tasks available.</div>;
 
   const task = tasks[current];
-  if (task.type === 'dots') {
+  if (task.type === 'dot_count') {
     let filename = '';
     if (task.image) {
       const parts = task.image.split('/');

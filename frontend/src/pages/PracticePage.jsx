@@ -12,13 +12,19 @@ export default function PracticePage({ group, onComplete }) {
   const [submitting, setSubmitting] = useState(false);
   const timerRef = useRef(-1);
 
-  useEffect(() => {
-    fetch(new URL(`/api/practice-questions?group=${group}`, backendUrl))
-      .then(res => res.json())
-      .then(data => {
-        setQuestions(data);
-        setLoading(false);
-      });
+  useEffect(() => {(async () => {
+    try {
+      const res = await fetch(new URL(`/api/practice-questions?group=${group}`, backendUrl));
+      if (!res.ok) {
+        throw new Error('Backend error: ' + res.statusText);
+      }
+      const data = await res.json();
+      setQuestions(data);
+      setLoading(false);
+    } catch (err) {
+      alert(err);  // includes those from res.json()
+    }
+  })();
   }, [group]);
 
   useEffect(() => {
@@ -46,13 +52,7 @@ export default function PracticePage({ group, onComplete }) {
     const q = questions[current];
     // Submit answer to backend (optional for practice)
     // Show feedback (correct answer)
-    let correct = '';
-    try {
-      const params = JSON.parse(q.params);
-      correct = q.correct || params.correct || '';
-    } catch {
-      correct = q.correct || '';
-    }
+    let correct = q.answer;
     setFeedback(`Correct answer: ${correct}`);
     setShowFeedback(true);
     setSubmitting(false);
@@ -71,11 +71,7 @@ export default function PracticePage({ group, onComplete }) {
   if (loading) return <div className="App"><h2>Loading practice questions...</h2></div>;
   if (!questions.length) return <div className="App"><h2>No practice questions available.</h2></div>;
   const q = questions[current];
-  let imgSrc = '';
-  try {
-    const params = JSON.parse(q.params);
-    imgSrc = params.img ? new URL(`/images/${params.img}`, backendUrl) : '';
-  } catch {}
+  let imgSrc = q.image;
   return (
     <div className="App">
       <h2>Practice Task {current + 1} / {questions.length}</h2>

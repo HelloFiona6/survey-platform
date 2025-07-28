@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const csv = require('csv-parser'); // Ensure you have csv-parser installed
 
-const imagesDir = path.join(__dirname, 'images');
+const imagesDir = './images';
 
 
 /**
@@ -27,7 +27,7 @@ async function readCsv(fileName) {
  * @returns {Promise<{ location: String, dot_count: Number, distribution: String }[]>}
  */
 async function adaptIndex(dirName) {
-  const indexFilePath = path.join(dirName, 'index.csv');
+  const indexFilePath = path.posix.join(dirName, 'index.csv');
   if (!fs.existsSync(indexFilePath)) {
     throw new Error(`Index file not found at ${indexFilePath}`);
   }
@@ -36,7 +36,7 @@ async function adaptIndex(dirName) {
     .map(entry => {
       return {
         distribution: entry['distribution'],
-        location: path.relative(imagesDir, path.join(dirName, entry['filename'])),
+        location: path.posix.relative(imagesDir, path.posix.join(dirName.replace(/\\/g, '/'), entry['filename'].replace(/\\/g, '/'))),
         dot_count: entry['dot_number'],
       };
     });
@@ -57,7 +57,7 @@ async function initQuestionsFromImagesAsync(db) {
   let results = [];
   for (const dir of /*directories*/['.']) {
     try {
-      const adaptedEntries = await adaptIndex(path.join(imagesDir, dir));
+      const adaptedEntries = await adaptIndex(path.posix.join(imagesDir, dir));
       results = results.concat(adaptedEntries);
     } catch (error) {
       console.error(`Error processing directory ${dir}:`, error.message);
