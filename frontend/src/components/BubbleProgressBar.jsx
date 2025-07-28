@@ -3,7 +3,7 @@
 */
 import React from 'react';
 
-export default function BubbleProgressBar({ total, current }) {
+export default function BubbleProgressBar({total, current}) {
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -20,7 +20,7 @@ export default function BubbleProgressBar({ total, current }) {
       position: 'relative',
       zIndex: 2
     }}>
-      {Array.from({ length: total }).map((_, i) => {
+      {Array.from({length: total}).map((_, i) => {
         let style = {
           width: 40, height: 40, minWidth: 40, minHeight: 40, maxWidth: 40, maxHeight: 40, borderRadius: '50%',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -58,7 +58,7 @@ export default function BubbleProgressBar({ total, current }) {
                 margin: '0 2px', borderRadius: 1,
                 boxShadow: '0 1px 2px #0001',
                 alignSelf: 'center',
-              }} />
+              }}/>
             )}
           </React.Fragment>
         );

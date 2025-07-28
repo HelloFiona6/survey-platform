@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {backendUrl} from "../index";
 
-export default function FeedbackPage({ user, task, onSubmit }) {
+export default function FeedbackPage({user, task, onSubmit}) {
   const [confidence, setConfidence] = useState('');
   const [preference, setPreference] = useState('');
   const [strategy, setStrategy] = useState('');
@@ -16,7 +16,7 @@ export default function FeedbackPage({ user, task, onSubmit }) {
     // Submit feedback to backend
     await fetch(new URL('/api/feedback', backendUrl), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: user.id,
         task,
@@ -31,16 +31,16 @@ export default function FeedbackPage({ user, task, onSubmit }) {
   return (
     <div className="App">
       <h2>Feedback</h2>
-      <div style={{ margin: '1em 0' }}>
+      <div style={{margin: '1em 0'}}>
         <label>
           Confidence (1-5):&nbsp;
           <select value={confidence} onChange={e => setConfidence(e.target.value)}>
             <option value="">Select</option>
-            {[1,2,3,4,5].map(n => <option key={n} value={n}>{n}</option>)}
+            {[1, 2, 3, 4, 5].map(n => <option key={n} value={n}>{n}</option>)}
           </select>
         </label>
       </div>
-      <div style={{ margin: '1em 0' }}>
+      <div style={{margin: '1em 0'}}>
         <label>
           Did you like this task?&nbsp;
           <select value={preference} onChange={e => setPreference(e.target.value)}>
@@ -51,14 +51,14 @@ export default function FeedbackPage({ user, task, onSubmit }) {
           </select>
         </label>
       </div>
-      <div style={{ margin: '1em 0' }}>
+      <div style={{margin: '1em 0'}}>
         <label>
-          What strategy did you use?<br />
-          <textarea value={strategy} onChange={e => setStrategy(e.target.value)} rows={3} style={{ width: '100%' }} />
+          What strategy did you use?<br/>
+          <textarea value={strategy} onChange={e => setStrategy(e.target.value)} rows={3} style={{width: '100%'}}/>
         </label>
       </div>
       <button onClick={handleSubmit}>Submit Feedback</button>
-      {error && <div style={{ color: 'red', marginTop: '1em' }}>{error}</div>}
+      {error && <div style={{color: 'red', marginTop: '1em'}}>{error}</div>}
     </div>
   );
 } 

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import {backendUrl} from "../index";
 
-export default function LoginPage({ onLogin }) {
+export default function LoginPage({onLogin}) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -15,8 +15,8 @@ export default function LoginPage({ onLogin }) {
     try {
       const res = await fetch(new URL('/api/login', backendUrl), {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({username, password}),
       });
       const data = await res.json();
       if (res.ok) {
@@ -37,17 +37,17 @@ export default function LoginPage({ onLogin }) {
         placeholder="Username"
         value={username}
         onChange={e => setUsername(e.target.value)}
-        style={{ width: '100%' }}
+        style={{width: '100%'}}
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={e => setPassword(e.target.value)}
-        style={{ width: '100%', marginTop: '1em' }}
+        style={{width: '100%', marginTop: '1em'}}
       />
-      <button onClick={handleLogin} style={{ width: '100%' }}>Login</button>
-      {error && <div style={{ color: 'red', marginTop: '1em' }}>{error}</div>}
+      <button onClick={handleLogin} style={{width: '100%'}}>Login</button>
+      {error && <div style={{color: 'red', marginTop: '1em'}}>{error}</div>}
     </div>
   );
 } 

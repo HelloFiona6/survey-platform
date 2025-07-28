@@ -46,6 +46,7 @@
   border-color: #9ca3af; /* gray-400 */
   border-radius: 0.375rem; /* Equivalent to Tailwind's rounded-md (6px) */
 }
+
 .image-holder > img {
   width: 15rem; /* Equivalent to Tailwind's w-32 (128px) */
   height: 15rem; /* Equivalent to Tailwind's h-32 (128px) */

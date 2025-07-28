@@ -49,16 +49,22 @@ body, html, #root {
   width: 100vw;
   background: url(../public/hero.jpg) center/cover no-repeat;
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 0;
 }
 
 .overlay {
   min-height: 100vh;
   width: 100vw;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1;
 }
 
@@ -72,8 +78,8 @@ body, html, #root {
 }
 
 .card {
-  background: rgba(255,255,255,0.92);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   border-radius: 18px;
   padding: 2.5rem 2rem;
   min-width: 340px;
@@ -129,9 +135,9 @@ button:disabled {
 }
 
 .hero-content {
-  background: rgba(255,255,255,0.85);
+  background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   padding: 2.5rem 2rem;
   min-width: 340px;
   max-width: 95vw;
@@ -146,15 +152,18 @@ button:disabled {
   opacity: 0;
   transform: translateY(30px) scale(0.98);
 }
+
 .fade-enter-active {
   opacity: 1;
   transform: translateY(0) scale(1);
   transition: opacity 400ms, transform 400ms;
 }
+
 .fade-exit {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
+
 .fade-exit-active {
   opacity: 0;
   transform: translateY(-30px) scale(0.98);

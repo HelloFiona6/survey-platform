@@ -15,8 +15,13 @@ import BubbleProgressBar from "./BubbleProgressBar";
  * @constructor
  */
 function SortByCountTask({
-  images, onSubmit, timeLimit=30, total=1, current=1, title="Sort the images by number of dots ascending"
-}) {
+                           images,
+                           onSubmit,
+                           timeLimit = 30,
+                           total = 1,
+                           current = 1,
+                           title = "Sort the images by number of dots ascending"
+                         }) {
   const [showInfo, setShowInfo] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -49,16 +54,16 @@ function SortByCountTask({
     setIsSubmitted(true);
     setTimeUp(false);
     const imageIds = images.map(I => I.id);
-    onSubmit(imagesRetVal.current.map(I=>imageIds.indexOf(I.id)));
+    onSubmit(imagesRetVal.current.map(I => imageIds.indexOf(I.id)));
   };
 
 
   return <div id={"task-container"}>
     <div className={"title"}>{title}</div>
-    <BubbleProgressBar total={total} current={current} />
+    <BubbleProgressBar total={total} current={current}/>
     <div id={"timer"}>{timeLeft}</div>
     <div id={"info"}>
-      <span className={"icon"} title={"Show image info"} onClick={() => setShowInfo(v=>!v)}>i</span>
+      <span className={"icon"} title={"Show image info"} onClick={() => setShowInfo(v => !v)}>i</span>
       {showInfo && (
         <div className={"popup"}>
           <div>Image Info</div>
@@ -68,7 +73,7 @@ function SortByCountTask({
     </div>
     {!isSubmitted ? (
       <>
-        <ImageSorter images={images} informParent={images => imagesRetVal.current=images}/>
+        <ImageSorter images={images} informParent={images => imagesRetVal.current = images}/>
         <div className={"form"}>
           {timeUp && (
             <div className={"notice"}>

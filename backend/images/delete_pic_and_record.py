@@ -1,6 +1,6 @@
 # 删除图片以及对应的question.csv中的记录
-import os
 import csv
+import os
 
 # 配置
 images_dir = 'backend/images'

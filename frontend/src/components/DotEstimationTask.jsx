@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import BubbleProgressBar from './BubbleProgressBar';
 import './GenericTask.css'
 
 export default function DotEstimationTask({
-  image, filename, distribution, onSubmit,
-  timeLimit = 30, total, current, title = 'Estimate the number of dots'
-}) {
+                                            image, filename, distribution, onSubmit,
+                                            timeLimit = 30, total, current, title = 'Estimate the number of dots'
+                                          }) {
   const [input, setInput] = useState('');
   const [timeLeft, setTimeLeft] = useState(timeLimit);
   const [showInfo, setShowInfo] = useState(false);
@@ -39,7 +39,7 @@ export default function DotEstimationTask({
     clearInterval(timerRef.current);
     setIsSubmitted(true);
     setTimeUp(false);
-    onSubmit({ answer: input, timeSpent: timeLimit - timeLeft, auto });
+    onSubmit({answer: input, timeSpent: timeLimit - timeLeft, auto});
     setInput('');
   };
 
@@ -48,7 +48,7 @@ export default function DotEstimationTask({
       {/* 标题 */}
       <div className={"title"}>{title}</div>
       {/* 进度条 */}
-      <BubbleProgressBar total={total} current={current} />
+      <BubbleProgressBar total={total} current={current}/>
       {/* 倒计时在图片外部右上角 */}
       <div id={"timer"}>{timeLeft}s</div>
       {/* info icon */}
@@ -60,7 +60,7 @@ export default function DotEstimationTask({
         >i</span>
         {showInfo && (
           <div className={"popup"}>
-            <div style={{ fontWeight: 600, marginBottom: 6 }}>Image Info</div>
+            <div style={{fontWeight: 600, marginBottom: 6}}>Image Info</div>
             <div><b>Filename:</b> {filename || 'N/A'}</div>
             {distribution && <div><b>Distribution:</b> {distribution}</div>}
           </div>
@@ -70,13 +70,19 @@ export default function DotEstimationTask({
       {!isSubmitted && (
         <>
           {!timeUp && (
-            <div style={{ margin: '2.5em 0 2.5em 0', display: 'flex', justifyContent: 'center' }}>
-              <img src={image} alt="dots" style={{ maxWidth: 420, maxHeight: 420, border: '1.5px solid #ccc', borderRadius: 16, boxShadow: '0 4px 24px #0001' }} />
+            <div style={{margin: '2.5em 0 2.5em 0', display: 'flex', justifyContent: 'center'}}>
+              <img src={image} alt="dots" style={{
+                maxWidth: 420,
+                maxHeight: 420,
+                border: '1.5px solid #ccc',
+                borderRadius: 16,
+                boxShadow: '0 4px 24px #0001'
+              }}/>
             </div>
           )}
           <div className={"form"}>
             {timeUp && (
-              <div style={{ color: '#0071e3', fontSize: 18, marginBottom: 8, fontWeight: 500 }}>
+              <div style={{color: '#0071e3', fontSize: 18, marginBottom: 8, fontWeight: 500}}>
                 Time is up, but you can still submit your answer
               </div>
             )}
@@ -91,19 +97,27 @@ export default function DotEstimationTask({
                   handleSubmit(false);
                 }
               }}
-              style={{ margin: '1em 0', width: 160, fontSize: 18, borderRadius: 10, padding: '0.7em 1em', border: '1.5px solid #e0e0e0', boxShadow: '0 2px 8px #0001' }}
+              style={{
+                margin: '1em 0',
+                width: 160,
+                fontSize: 18,
+                borderRadius: 10,
+                padding: '0.7em 1em',
+                border: '1.5px solid #e0e0e0',
+                boxShadow: '0 2px 8px #0001'
+              }}
             />
             <button onClick={
               () => {
                 const str = inputRef.current.value;
                 if (str.trim() === '' || isNaN(Number(str))) {
-                    alert('Please enter a number');
-                }
-                else {
-                    handleSubmit(false);
+                  alert('Please enter a number');
+                } else {
+                  handleSubmit(false);
                 }
               }
-            } >Submit</button>
+            }>Submit
+            </button>
           </div>
         </>
       )}

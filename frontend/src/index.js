@@ -8,7 +8,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 document.title = 'GEARS WoS Experiment';
 root.render(
   <React.StrictMode>
-    <App />
+    <App/>
   </React.StrictMode>
 );
 

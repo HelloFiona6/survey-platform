@@ -67,7 +67,7 @@ def remove_unindexed():
 
 def find_entries(query: dict) -> list[dict]:
     def match(q: dict, r: dict):
-        return all(str(q[k])==r[k] for k in q.keys()&r.keys())
+        return all(str(q[k]) == r[k] for k in q.keys() & r.keys())
 
     with open(INDEX_FILE, 'r') as f:
         reader = csv.DictReader(f, CSV_HEADER)
@@ -128,7 +128,7 @@ if __name__ == "__main__":
             refresh_index()
             remove_unindexed()
         elif args.command == 'find':
-            keys = {k: getattr(args,k) for k in CSV_HEADER if getattr(args,k)}
+            keys = {k: getattr(args, k) for k in CSV_HEADER if getattr(args, k)}
             if len(keys) == 0:
                 print('no keys provided')
                 parser.print_help()

@@ -7,7 +7,7 @@ const imagesDir = './images';
 
 /**
  * Encapsulate CSV
- * @param {String} fileName 
+ * @param {String} fileName
  * @returns {Promise<Object[]>}
  */
 async function readCsv(fileName) {
@@ -23,7 +23,7 @@ async function readCsv(fileName) {
 
 /**
  * Assumes good index.
- * @param {String} dirName 
+ * @param {String} dirName
  * @returns {Promise<{ location: String, dot_count: Number, distribution: String }[]>}
  */
 async function adaptIndex(dirName) {
@@ -75,7 +75,7 @@ async function initQuestionsFromImagesAsync(db) {
     }
 
     await db.runAsync("COMMIT");
-  } catch (err){
+  } catch (err) {
     if (err) {
       console.error('Error during database transaction:', err.message);
     } else {

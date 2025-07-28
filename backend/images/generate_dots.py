@@ -11,7 +11,7 @@ import numpy as np
 
 from manage_imgs import append_index_row, init_index
 
-DOT_NUMBERS = range(40,60)  # for each image. we may use range iterators or list comprehensions
+DOT_NUMBERS = range(40, 60)  # for each image. we may use range iterators or list comprehensions
 DOT_SEP = 0.03  # don't overlap
 PATH = '.'
 DISTRIBUTION = 'uniform'
@@ -103,7 +103,6 @@ parser.add_argument(
          f'Allowed values: {", ".join(DOT_SAMPLERS.keys())}.'
 )
 
-
 if __name__ == "__main__":
     args = parser.parse_args()
     sampler_name = args.DISTRIBUTION
@@ -112,7 +111,7 @@ if __name__ == "__main__":
         existing_locations = []
         dots = len(existing_locations)
 
-        #add each dot
+        # add each dot
         plt.clf()
         sampler = DOT_SAMPLERS[sampler_name]()  # actually, it's a callable object, not a function.
         while len(existing_locations) != n_dots:
@@ -120,7 +119,7 @@ if __name__ == "__main__":
             if not np.all((0 < new_location) & (new_location < 1)):
                 continue
 
-            #check to ensure new dot is not too close to others
+            # check to ensure new dot is not too close to others
             distances = [np.linalg.norm(loc - new_location) for loc in existing_locations]
             if any([dist < args.DOT_SEP for dist in distances]):
                 continue
@@ -129,8 +128,8 @@ if __name__ == "__main__":
 
         plt.plot(*zip(*existing_locations), 'ko', markersize=min(args.DOT_SEP * 180, 5), markeredgewidth=0)
         axes = plt.gca()
-        axes.set_xlim([-0.05,1.05])
-        axes.set_ylim([-0.05,1.05])
+        axes.set_xlim([-0.05, 1.05])
+        axes.set_ylim([-0.05, 1.05])
         axes.set_aspect('equal')
         plt.axis('off')
 

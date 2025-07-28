@@ -1,5 +1,6 @@
 import {useMemo, useRef, useState} from "react";
 import './ImageSorter.css'
+
 /**
  * ImageSorter Component
  *
@@ -11,7 +12,7 @@ import './ImageSorter.css'
  * @param {{id:String, src:String, alt:String}[]} props.images - An array of image representations
  * @param {Function} props.informParent - A (images)=>void hook to update sorting results upwards
  */
-function ImageSorter({images,informParent}) {
+function ImageSorter({images, informParent}) {
   const [imageList, setImageList] = useState(images);  // current order of images
   const [draggingImageId, setDraggingImageId] = useState(null);
 
@@ -36,7 +37,7 @@ function ImageSorter({images,informParent}) {
 
     const dragIcon = new Image();
     dragIcon.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';  // 1*1 transparent
-    e.dataTransfer.setDragImage(dragIcon,0,0)
+    e.dataTransfer.setDragImage(dragIcon, 0, 0)
   }
 
   /**
@@ -153,11 +154,11 @@ function ImageSorter({images,informParent}) {
           <div className="placeholder">Drag Here</div>
         ) : (
           <img src={image.uri} alt={image.alt}
-            onError={(e) => {
-              e.target.onerror = null; // Prevents infinite loop if fallback also fails
-              e.target.src = `https://placehold.co/150x150/CCCCCC/000000?text=Error`;
-              console.error(`Failed to load image: ${image.uri}`);
-            }}
+               onError={(e) => {
+                 e.target.onerror = null; // Prevents infinite loop if fallback also fails
+                 e.target.src = `https://placehold.co/150x150/CCCCCC/000000?text=Error`;
+                 console.error(`Failed to load image: ${image.uri}`);
+               }}
           />
         )}
         {/*{!isPlaceholder && <p className="mt-2 text-sm text-gray-700">{image.alt}</p>}*/}

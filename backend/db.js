@@ -22,16 +22,33 @@ class SurveyDB {
     });
   }
 
-  run(sql, params = [], callBack=undefined) {    return this.db.run(sql, params, callBack);  }
-  get(sql, params = [], callBack=undefined) {    return this.db.get(sql, params, callBack);  }
-  all(sql, params = [], callBack=undefined) {    return this.db.all(sql, params, callBack);  }
-  each(sql, params, rowCallback, completeCallback) {    return this.db.each(sql, params, rowCallback, completeCallback);  }
-  exec(sql, callBack=undefined) {    return this.db.exec(sql, callBack);  }
-  close() {    return this.db.close();  }
+  run(sql, params = [], callBack = undefined) {
+    return this.db.run(sql, params, callBack);
+  }
+
+  get(sql, params = [], callBack = undefined) {
+    return this.db.get(sql, params, callBack);
+  }
+
+  all(sql, params = [], callBack = undefined) {
+    return this.db.all(sql, params, callBack);
+  }
+
+  each(sql, params, rowCallback, completeCallback) {
+    return this.db.each(sql, params, rowCallback, completeCallback);
+  }
+
+  exec(sql, callBack = undefined) {
+    return this.db.exec(sql, callBack);
+  }
+
+  close() {
+    return this.db.close();
+  }
 
   async runAsync(sql, params = []) {
     return new Promise((resolve, reject) => {
-      this.db.run(sql, params, function(err) {
+      this.db.run(sql, params, function (err) {
         if (err) {
           reject(err);
         } else {
@@ -64,6 +81,7 @@ class SurveyDB {
       });
     });
   }
+
   async migrateAsync() {
     const db = this.db;
     try {

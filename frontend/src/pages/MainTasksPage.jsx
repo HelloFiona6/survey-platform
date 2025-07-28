@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import DotEstimationTask from '../components/DotEstimationTask';
 import SortByCountTask from '../components/SortByCountTask';
 import {backendUrl} from "../index";
@@ -20,34 +20,35 @@ import {backendUrl} from "../index";
 //     </div>
 //   );
 // }
-export default function MainTasksPage({ user, task, onComplete }) {
+export default function MainTasksPage({user, task, onComplete}) {
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(true);
 
   // 获取任务题目
-  useEffect(() => {(async () => {
-    // 假设后端返回 [{type: 'dots', image: ...}, {type: 'ranking', images: [...]}, ...]
-    try {
-      const res = await fetch(new URL(`/api/dot-task?user_id=${user.id}&?task=${task}`, backendUrl));
-      if (!res.ok) {
-        throw new Error('Backend error: ' + res.statusText);
+  useEffect(() => {
+    (async () => {
+      // 假设后端返回 [{type: 'dots', image: ...}, {type: 'ranking', images: [...]}, ...]
+      try {
+        const res = await fetch(new URL(`/api/dot-task?user_id=${user.id}&?task=${task}`, backendUrl));
+        if (!res.ok) {
+          throw new Error('Backend error: ' + res.statusText);
+        }
+        const data = await res.json();
+        setQuestions(data);
+        setLoading(false);
+      } catch (e) {
+        alert(e);  // includes those from res.json()
       }
-      const data = await res.json();
-      setQuestions(data);
-      setLoading(false);
-    } catch (e) {
-      alert(e);  // includes those from res.json()
-    }
-  })();
+    })();
   }, [user.id]);
 
   // 提交点数估计答案
-  const handleDotSubmit = ({ answer, timeSpent, auto }) => {
+  const handleDotSubmit = ({answer, timeSpent, auto}) => {
     const task = questions[current];
-    fetch(new URL('/api/response',backendUrl), {
+    fetch(new URL('/api/response', backendUrl), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         user_id: user.id,
         question_id: task.id,
@@ -107,7 +108,7 @@ export default function MainTasksPage({ user, task, onComplete }) {
     // TODO images should be Array<Object>, need API wrangling
     return (
       <SortByCountTask
-        images={[{id:"I1", src:question.image, alt:"image"}]}
+        images={[{id: "I1", src: question.image, alt: "image"}]}
         onSubmit={handleRankingSubmit}
         timeLimit={30}
       />

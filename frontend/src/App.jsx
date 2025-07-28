@@ -34,17 +34,17 @@ function App() {
         } else {
           setPage('consent');
         }
-        }} />;
+      }}/>;
       break;
     case 'consent':
-      pageElement = <ConsentPage onConsent={() => setPage('tutorial')} />;
+      pageElement = <ConsentPage onConsent={() => setPage('tutorial')}/>;
       break;
     case 'tutorial':
       pageElement = <TutorialPage group={user.group} onContinue={() => {
         setCurrentTaskIndex(x => 0);
         if (user.group === 'untrained') setPage('mainTasks');
         else setPage('practice');
-        }} />;
+      }}/>;
       break;
     case 'practice':
       pageElement = <PracticePage group={user.group} onComplete={() => {
@@ -53,33 +53,36 @@ function App() {
           return;
         }
         setCurrentTaskIndex(x => x + 1);
-        if (tasksRef.current[currentTaskIndex].type != 'practice') {
+        if (tasksRef.current[currentTaskIndex].type !== 'practice') {
           if (user.group === 'expert') setPage('strategy');
           else setPage('mainTasks');
         }
-        }} />;
+      }}/>;
       break;
     case 'mainTasks':
-      pageElement = <MainTasksPage user={user} onComplete={() => setPage('feedback')} />;
+      pageElement = <MainTasksPage user={user} onComplete={() => setPage('feedback')}/>;
       break;
     case 'strategy':
-      pageElement = <StrategyPage onContinue={() => setPage('mainTasks')} />;
+      pageElement = <StrategyPage onContinue={() => setPage('mainTasks')}/>;
       break;
     case 'feedback':
       pageElement = <FeedbackPage user={user} onSubmit={() => {
         if (currentTaskIndex + 1 < tasksRef.current.length) {
           setCurrentTaskIndex(x => x + 1);
           setPage('mainTasks')
-        } else  {
+        } else {
           setPage('end');
         }
-      }} />;
+      }}/>;
       break;
     case 'end':
-      pageElement = <EndPage />;
+      pageElement = <EndPage/>;
       break;
     case 'admin':
-      pageElement = <AdminPage onLogout={() => { setUser(null); setPage('login'); }} />;
+      pageElement = <AdminPage onLogout={() => {
+        setUser(null);
+        setPage('login');
+      }}/>;
       break;
   }
 
@@ -88,8 +91,8 @@ function App() {
     <>
       {showHero && (
         <>
-          <div className="hero-bg" />
-          <div className="overlay" />
+          <div className="hero-bg"/>
+          <div className="overlay"/>
         </>
       )}
       <SwitchTransition>

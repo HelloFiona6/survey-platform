@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {backendUrl} from "../index";
 
-export default function PracticePage({ group, onComplete }) {
+export default function PracticePage({group, onComplete}) {
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [input, setInput] = useState('');
@@ -12,19 +12,20 @@ export default function PracticePage({ group, onComplete }) {
   const [submitting, setSubmitting] = useState(false);
   const timerRef = useRef(-1);
 
-  useEffect(() => {(async () => {
-    try {
-      const res = await fetch(new URL(`/api/practice-questions?group=${group}`, backendUrl));
-      if (!res.ok) {
-        throw new Error('Backend error: ' + res.statusText);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch(new URL(`/api/practice-questions?group=${group}`, backendUrl));
+        if (!res.ok) {
+          throw new Error('Backend error: ' + res.statusText);
+        }
+        const data = await res.json();
+        setQuestions(data);
+        setLoading(false);
+      } catch (err) {
+        alert(err);  // includes those from res.json()
       }
-      const data = await res.json();
-      setQuestions(data);
-      setLoading(false);
-    } catch (err) {
-      alert(err);  // includes those from res.json()
-    }
-  })();
+    })();
   }, [group]);
 
   useEffect(() => {
@@ -75,15 +76,15 @@ export default function PracticePage({ group, onComplete }) {
   return (
     <div className="App">
       <h2>Practice Task {current + 1} / {questions.length}</h2>
-      <div style={{ margin: '1em 0' }}>
+      <div style={{margin: '1em 0'}}>
         {imgSrc ? (
-          <img src={imgSrc} alt="practice" style={{ maxWidth: 400, maxHeight: 400, border: '1px solid #ccc' }} />
+          <img src={imgSrc} alt="practice" style={{maxWidth: 400, maxHeight: 400, border: '1px solid #ccc'}}/>
         ) : <div>No image</div>}
       </div>
       {!showFeedback && (
         <>
           <div>Time left: <b>{timeLeft}s</b></div>
-          <div style={{ margin: '1em 0' }}>
+          <div style={{margin: '1em 0'}}>
             <input
               type="number"
               placeholder="Estimate number of dots"
@@ -96,12 +97,12 @@ export default function PracticePage({ group, onComplete }) {
         </>
       )}
       {showFeedback && (
-        <div style={{ margin: '1em 0', color: 'green' }}>
+        <div style={{margin: '1em 0', color: 'green'}}>
           <div>{feedback}</div>
           <button onClick={handleNext}>Next</button>
         </div>
       )}
-      <div style={{ marginTop: '1em' }}>Remaining: {questions.length - current - 1}</div>
+      <div style={{marginTop: '1em'}}>Remaining: {questions.length - current - 1}</div>
     </div>
   );
 } 
