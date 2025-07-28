@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {backendUrl} from "../index";
 
-export default function FeedbackPage({ user, onSubmit }) {
+export default function FeedbackPage({ user, task, onSubmit }) {
   const [confidence, setConfidence] = useState('');
   const [preference, setPreference] = useState('');
   const [strategy, setStrategy] = useState('');
@@ -19,6 +19,7 @@ export default function FeedbackPage({ user, onSubmit }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         user_id: user.id,
+        task,
         confidence,
         preference,
         strategy,

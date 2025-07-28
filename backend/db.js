@@ -29,7 +29,7 @@ class SurveyDB {
   exec(sql, callBack=undefined) {    return this.db.exec(sql, callBack);  }
   close() {    return this.db.close();  }
 
-  runAsync(sql, params = []) {
+  async runAsync(sql, params = []) {
     return new Promise((resolve, reject) => {
       this.db.run(sql, params, function(err) {
         if (err) {
@@ -40,7 +40,8 @@ class SurveyDB {
       });
     });
   }
-  getAsync(sql, params = []) {
+
+  async getAsync(sql, params = []) {
     return new Promise((resolve, reject) => {
       this.db.get(sql, params, (err, row) => {
         if (err) {
@@ -51,13 +52,14 @@ class SurveyDB {
       });
     });
   }
-  prepareAsync(sql) {
+
+  async allAsync(sql, params) {
     return new Promise((resolve, reject) => {
-      const stmt = this.db.prepare(sql, (err) => {
+      this.db.all(sql, params, (err, rows) => {
         if (err) {
           reject(err);
         } else {
-          resolve(stmt);
+          resolve(rows);
         }
       });
     });

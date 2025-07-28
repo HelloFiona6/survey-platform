@@ -165,6 +165,7 @@ app.post('/api/response', (req, res) => {
 });
 
 /**
+ * DEPRECATED
  * 获取默认任务题目
  * 单个SQL查询，找出所有符合给定 用户ID、任务阶段、题目类型 的题目
  */
@@ -248,28 +249,81 @@ app.get('/api/practice-questions', async (req, res) => {
       JOIN question_material ON questions.id = question_material.question_id
       JOIN dot_material ON question_material.material_id = dot_material.id
     `;
-  db.all(sql, [group], (err, rows) => {
-    if (err) {
-      console.error('Error fetching practice questions:', err.message);
-      return res.status(500).json({ error: 'Database error.' });
-    }
-    if (rows.length === 0) {
-      return res.status(404).json({ message: 'No practice questions found.' });
-    }
-    const questions = rows.map(row => ({
-      id: row.qid,
-      type: row.tp,
-      answer: row.gt,
-      image: `${BACKEND_DOMAIN}:${PORT}/images/${row.src}`,  // can't use path.posix.join because of '://'
-      distribution: row.dist || ''
-    }));
-    res.json(questions);
-  })
-  console.log(req.url);
-})
+    db.all(sql, [group], (err, rows) => {
+      if (err) {
+        console.error('Error fetching practice questions:', err.message);
+        return res.status(500).json({error: 'Database error.'});
+      }
+      if (rows.length === 0) {
+        return res.status(404).json({message: 'No practice questions found.'});
+      }
+      const questions = rows.map(row => ({
+        id: row.qid,
+        type: row.tp,
+        answer: row.gt,
+        image: `${BACKEND_DOMAIN}:${PORT}/images/${row.src}`,  // can't use path.posix.join because of '://'
+        distribution: row.dist || ''
+      }));
+      res.json(questions);
+    })
+    console.log(req.url);
+  });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+  app.post('/api/feedback', async (req, res) => {
+    const {user_id, confidence, preference, strategy, task} = req.body;
+  });
+
+  app.get('/api/task-list', async (req, res) => {
+    const sql = `
+    select id, type, config
+    from tasks
+    where id in (select tasks.id from tasks join users on tasks."group"=users."group" where users.id=?)
+    `;
+    const userId = req.query.user_id;
+    const rows= await db.all(sql, [userId]);
+    if (rows.length > 0) {
+      res.json(rows.sort((a,b)=>(a==b?0:(b=='main'?-1:1))));
+    }
+    else{
+      res.status(404);
+    }
+  })
+
+  app.get('/api/dot-task', async (req, res) => {
+    const sql = `
+          WITH T AS (
+              SELECT tasks.id FROM tasks join users on tasks."group"=users."group"
+              WHERE users.id = ? and tasks.id=? 
+          ),
+               Q AS (
+                   SELECT questions.type as type, question_id
+                   FROM
+                       T
+                           JOIN task_question ON T.id = task_question.task_id
+                           JOIN questions ON questions.id = task_question.question_id
+               )
+          SELECT
+              Q.question_id AS id,
+              Q.type AS type,
+              DM.location AS src,
+              DM.distribution AS dist
+          FROM
+              Q
+                  JOIN question_material AS QM ON Q.question_id = QM.question_id
+                  JOIN dot_material AS DM ON DM.id = QM.material_id
+    `;
+    const userId = req.query.user_id;
+    const task = req.query.task;
+    const rows = await db.all(sql, [userId, task]);
+    if (rows.length > 0) {
+      res.json(rows);
+    } else {
+      res.status(404);
+    }
+  })
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 
 })();

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useRef, useState} from 'react';
 import './App.css';
 import LoginPage from './pages/LoginPage';
 import ConsentPage from './pages/ConsentPage';
@@ -9,7 +9,7 @@ import MainTasksPage from './pages/MainTasksPage';
 import FeedbackPage from './pages/FeedbackPage';
 import EndPage from './pages/EndPage';
 import AdminPage from './pages/AdminPage';
-import { CSSTransition, SwitchTransition } from 'react-transition-group';
+import {CSSTransition, SwitchTransition} from 'react-transition-group';
 
 function App() {
   const [page, setPage] = useState('login');
@@ -17,6 +17,8 @@ function App() {
 
   // 新增：为动画内容创建 ref
   const nodeRef = useRef(null);
+  const tasksRef = useRef([]);
+  const [currentTaskIndex, setCurrentTaskIndex] = useState(-1);
 
   // 只在 mainTasks 之前显示 hero 和 overlay
   const showHero = !['mainTasks', 'feedback', 'end', 'admin'].includes(page);
@@ -39,24 +41,39 @@ function App() {
       break;
     case 'tutorial':
       pageElement = <TutorialPage group={user.group} onContinue={() => {
+        setCurrentTaskIndex(x => 0);
         if (user.group === 'untrained') setPage('mainTasks');
         else setPage('practice');
         }} />;
       break;
     case 'practice':
       pageElement = <PracticePage group={user.group} onComplete={() => {
-        if (user.group === 'expert') setPage('strategy');
-        else setPage('mainTasks');
+        if (currentTaskIndex + 1 < tasksRef.current.length) {
+          alert(`Only having ${tasksRef.current.length} tasks, but current task is ${currentTaskRef.current}`);
+          return;
+        }
+        setCurrentTaskIndex(x => x + 1);
+        if (tasksRef.current[currentTaskIndex].type != 'practice') {
+          if (user.group === 'expert') setPage('strategy');
+          else setPage('mainTasks');
+        }
         }} />;
-      break;
-    case 'strategy':
-      pageElement = <StrategyPage onContinue={() => setPage('mainTasks')} />;
       break;
     case 'mainTasks':
       pageElement = <MainTasksPage user={user} onComplete={() => setPage('feedback')} />;
       break;
+    case 'strategy':
+      pageElement = <StrategyPage onContinue={() => setPage('mainTasks')} />;
+      break;
     case 'feedback':
-      pageElement = <FeedbackPage user={user} onSubmit={() => setPage('end')} />;
+      pageElement = <FeedbackPage user={user} onSubmit={() => {
+        if (currentTaskIndex + 1 < tasksRef.current.length) {
+          setCurrentTaskIndex(x => x + 1);
+          setPage('mainTasks')
+        } else  {
+          setPage('end');
+        }
+      }} />;
       break;
     case 'end':
       pageElement = <EndPage />;

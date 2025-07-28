@@ -20,8 +20,8 @@ import {backendUrl} from "../index";
 //     </div>
 //   );
 // }
-export default function MainTasksPage({ user, onComplete }) {
-  const [tasks, setTasks] = useState([]);
+export default function MainTasksPage({ user, task, onComplete }) {
+  const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -29,12 +29,12 @@ export default function MainTasksPage({ user, onComplete }) {
   useEffect(() => {(async () => {
     // 假设后端返回 [{type: 'dots', image: ...}, {type: 'ranking', images: [...]}, ...]
     try {
-      const res = await fetch(new URL(`/api/main-tasks?user_id=${user.id}`, backendUrl));
+      const res = await fetch(new URL(`/api/dot-task?user_id=${user.id}&?task=${task}`, backendUrl));
       if (!res.ok) {
         throw new Error('Backend error: ' + res.statusText);
       }
       const data = await res.json();
-      setTasks(data);
+      setQuestions(data);
       setLoading(false);
     } catch (e) {
       alert(e);  // includes those from res.json()
@@ -44,7 +44,7 @@ export default function MainTasksPage({ user, onComplete }) {
 
   // 提交点数估计答案
   const handleDotSubmit = ({ answer, timeSpent, auto }) => {
-    const task = tasks[current];
+    const task = questions[current];
     fetch(new URL('/api/response',backendUrl), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -57,13 +57,13 @@ export default function MainTasksPage({ user, onComplete }) {
         time_spent: timeSpent,
       }),
     }).catch(e => alert(e));
-    if (current + 1 < tasks.length) setCurrent(current + 1);
+    if (current + 1 < questions.length) setCurrent(current + 1);
     else onComplete();
   };
 
   // 提交图片排序答案
   const handleRankingSubmit = (order) => {
-    const task = tasks[current];
+    const task = questions[current];
     fetch(new URL('/api/response', backendUrl), {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -76,38 +76,38 @@ export default function MainTasksPage({ user, onComplete }) {
         time_spent: null,
       }),
     }).catch(e => alert(e));
-    if (current + 1 < tasks.length) setCurrent(current + 1);
+    if (current + 1 < questions.length) setCurrent(current + 1);
     else onComplete();
   };
 
   if (loading) return <div>Loading tasks...</div>;
-  if (!tasks.length) return <div>No tasks available.</div>;
+  if (!questions.length) return <div>No tasks available.</div>;
 
-  const task = tasks[current];
-  if (task.type === 'dot_count') {
+  const question = questions[current];
+  if (question.type === 'dot_count') {
     let filename = '';
-    if (task.image) {
-      const parts = task.image.split('/');
+    if (question.image) {
+      const parts = question.image.split('/');
       filename = parts[parts.length - 1];
     }
     return (
       <DotEstimationTask
-        image={task.image}
+        image={question.image}
         filename={filename}
-        distribution={task.distribution}
+        distribution={question.distribution}
         onSubmit={handleDotSubmit}
         timeLimit={30}
-        total={tasks.length}
+        total={questions.length}
         current={current}
         title="Estimate the number of dots"
       />
     );
   }
-  if (task.type === 'ranking') {
+  if (question.type === 'ranking') {
     // TODO images should be Array<Object>, need API wrangling
     return (
       <SortByCountTask
-        images={[{id:"I1", src:task.image, alt:"image"}]}
+        images={[{id:"I1", src:question.image, alt:"image"}]}
         onSubmit={handleRankingSubmit}
         timeLimit={30}
       />
