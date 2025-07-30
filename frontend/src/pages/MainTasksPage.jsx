@@ -98,7 +98,7 @@ export default function MainTasksPage({user, task, onComplete}) {
         filename={filename}
         distribution={question.distribution}
         onSubmit={handleDotSubmit}
-        timeLimit={12}
+        timeLimit={15}
         total={questions.length}
         current={current}
         title="Estimate the number of dots"

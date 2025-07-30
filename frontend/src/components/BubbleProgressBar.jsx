@@ -22,7 +22,7 @@ export default function BubbleProgressBar({total, current}) {
     }}>
       {Array.from({length: total}).map((_, i) => {
         let style = {
-          width: 40, height: 40, minWidth: 40, minHeight: 40, maxWidth: 40, maxHeight: 40, borderRadius: '50%',
+          width: 30, height: 30, minWidth: 20, minHeight: 20, maxWidth: 40, maxHeight: 40, borderRadius: '50%',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontWeight: 700, fontSize: 22, margin: '0 2px', boxSizing: 'border-box', aspectRatio: '1 / 1',
           transition: 'background 0.2s, color 0.2s, border 0.2s, box-shadow 0.2s',
@@ -54,7 +54,7 @@ export default function BubbleProgressBar({total, current}) {
             <div style={style}><span style={numberStyle}>{i + 1}</span></div>
             {i < total - 1 && (
               <div style={{
-                width: 48, height: 2, background: '#b0b0b0',
+                width: 16, height: 2, background: '#b0b0b0',
                 margin: '0 2px', borderRadius: 1,
                 boxShadow: '0 1px 2px #0001',
                 alignSelf: 'center',

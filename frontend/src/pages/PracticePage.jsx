@@ -80,7 +80,7 @@ export default function PracticePage({group, onComplete}) {
       <h2>Practice Task {current + 1} / {questions.length}</h2>
       <div style={{margin: '1em 0'}}>
         {imgSrc ? (
-          <img src={imgSrc} alt="practice" style={{maxWidth: 400, maxHeight: 400, border: '1px solid #ccc'}}/>
+          <img src={imgSrc} alt="practice" style={{maxWidth: '100%', maxHeight: 400, border: '1px solid #ccc', minWidth: 180,}}/>
         ) : <div>No image</div>}
       </div>
       {!showFeedback && (

@@ -5,7 +5,7 @@ export default function StrategyPage({onContinue}) {
   useEffect(() => {
     // Optionally fetch from backend
     setStrategy(
-      'Strategy examples:\n- Multiply horizontal and vertical density\n- Sample a section and extrapolate\n- Use visual grouping'
+      'Strategy examples:\n\n- Multiply horizontal and vertical density\n\n- Sample a section and extrapolate\n\n- Use visual grouping'
     );
   }, []);
   return (
