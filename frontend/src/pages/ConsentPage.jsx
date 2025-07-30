@@ -7,7 +7,7 @@ export default function ConsentPage({onConsent}) {
   const consentText = `
     Welcome to the study! This is a presentation of our website.
     
-    No data will be recorded for this. You may withdraw at any time.
+    All data are anonymously collected. You may withdraw at any time.
     
     By checking the box below, you agree to participate.
   `;
