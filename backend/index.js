@@ -33,6 +33,7 @@ const BACKEND_DOMAIN = "http://localhost";
     res.send('Backend is running!');
   });
 
+/*
 // 用户注册/登录与分组分配
   app.post('/api/register', (req, res) => {
     const {username, group} = req.body;
@@ -132,6 +133,7 @@ const BACKEND_DOMAIN = "http://localhost";
       }
     );
   });
+*/
 
 // 获取Dots题目
   app.get('/api/dots-questions', (req, res) => {
@@ -150,6 +152,8 @@ const BACKEND_DOMAIN = "http://localhost";
 
 // 提交答题
   app.post('/api/response', (req, res) => {
+    res.json({id: 99});
+    return;
     const {user_id, question_id, phase, response, correct, time_spent} = req.body;  // TODO remove phase and correct?
     if (!user_id || !question_id || !phase) {
       return res.status(400).json({error: 'Missing required fields.'});
@@ -268,6 +272,8 @@ const BACKEND_DOMAIN = "http://localhost";
   });
 
   app.post('/api/feedback', async (req, res) => {
+    res.json({id: 99});
+    return;
     const sql = `INSERT INTO responses (user_id, question_id, response)
                  VALUES (?,
                          (SELECT q.id
