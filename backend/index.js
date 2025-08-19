@@ -149,21 +149,20 @@ const BACKEND_DOMAIN = "http://localhost";
   });
 
 // 提交答题
-  app.post('/api/response', (req, res) => {
+  app.post('/api/response', async (req, res) => {
     const {user_id, question_id, phase, response, correct, time_spent} = req.body;  // TODO remove phase and correct?
     if (!user_id || !question_id || !phase) {
       return res.status(400).json({error: 'Missing required fields.'});
     }
-    db.run(
-      'INSERT INTO responses (user_id, question_id, response, time_spent) VALUES (?, ?, ?, ?)',
-      [user_id, question_id, response, time_spent],
-      function (err) {
-        if (err) {
-          return res.status(500).json({error: 'Database error.'});
-        }
-        res.json({id: this.lastID});
-      }
-    );
+    try {
+      const result = await db.runAsync(
+        'INSERT INTO responses (user_id, question_id, response, time_spent) VALUES (?, ?, ?, ?)',
+        [user_id, question_id, response, time_spent]
+      );
+      res.json({id: result.lastID});
+    } catch (err) {
+      res.status(500).json({error: 'Database error.'});
+    }
   });
 
   /**

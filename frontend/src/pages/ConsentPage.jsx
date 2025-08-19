@@ -5,8 +5,10 @@ export default function ConsentPage({onConsent}) {
 
   // You can fetch consent text from backend if needed
   const consentText = `
-    Welcome to the study! Your participation is voluntary. All data will be anonymized.
-    You may withdraw at any time. By checking the box below, you agree to participate.
+    Welcome to the study! 
+    🕶 All data will be anonymized.
+    You may withdraw at any time. 
+    By checking the box below, you agree to participate.
   `;
 
   return (
