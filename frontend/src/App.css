@@ -81,8 +81,8 @@ body, html, #root {
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   border-radius: 18px;
-  padding: 2.5rem 2rem;
-  min-width: 340px;
+  padding: 1.2rem 1rem;
+  min-width: 21rem;
   max-width: 95vw;
   margin: 2rem;
   text-align: center;
@@ -129,7 +129,7 @@ button:disabled {
 
 @media (max-width: 600px) {
   .card {
-    min-width: 90vw;
+    min-width: 15rem;
     padding: 1.2rem 0.5rem;
   }
 }
@@ -138,8 +138,8 @@ button:disabled {
   background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
-  padding: 2.5rem 2rem;
-  min-width: 340px;
+  padding: 1.1rem 1rem;
+  min-width: 20rem;
   max-width: 95vw;
   margin: 2rem;
   text-align: center;

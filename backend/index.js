@@ -33,6 +33,7 @@ const BACKEND_DOMAIN = "http://localhost";
     res.send('Backend is running!');
   });
 
+/*
 // 用户注册/登录与分组分配
   app.post('/api/register', (req, res) => {
     const {username, group} = req.body;
@@ -132,6 +133,7 @@ const BACKEND_DOMAIN = "http://localhost";
       }
     );
   });
+*/
 
 // 获取Dots题目
   app.get('/api/dots-questions', (req, res) => {
