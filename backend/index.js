@@ -226,7 +226,10 @@ const BACKEND_DOMAIN = "http://localhost";
     console.log(req.url);
   });
 
-// for now, select a practice task and send all related questions.
+  /**
+   * DEPRECATED
+   * Select a practice task and send all related questions.
+   */
   app.get('/api/practice-questions', async (req, res) => {
     const group = req.query.group;
     const sql = `
@@ -306,12 +309,52 @@ const BACKEND_DOMAIN = "http://localhost";
     let rows = await db.allAsync(sql, [userId]);
     // rows = Array.from(rows);
     if (rows.length > 0) {
-      rows.sort((a, b) => (a.type === b.type ? 0 : (b.type === 'main' ? -1 : 1)));
+      rows.sort((a, b) => {
+        if (a.type === b.type) return 0;
+        if (b.type === 'main') return -1;  // main tasks first
+        else return -1;
+      })
       res.json(rows);
     } else {
       res.status(404).send();
     }
     console.log(req.url, rows);
+  })
+
+  app.get('/api/dot-practices', async (req, res) => {
+    const sql = `
+        WITH T AS (SELECT tasks.id
+                   FROM tasks
+                   WHERE tasks."group" = ?
+                     AND tasks.id = ?
+                     AND tasks.type = 'practice'),
+             Q AS (SELECT question_id
+                   FROM T
+                            JOIN task_question ON T.id = task_question.task_id)
+        SELECT Q.question_id          AS id,
+               questions.type         AS type,
+               questions.ground_truth as gt,
+               DM.location            AS src,
+               DM.distribution        AS dist
+        FROM Q
+                 JOIN questions ON Q.question_id = questions.id
+                 JOIN question_material AS QM ON Q.question_id = QM.question_id
+                 JOIN dot_material AS DM ON DM.id = QM.material_id
+    `;
+    const group = req.query.group, taskId = req.query.task;
+    const rows = await db.allAsync(sql, [group, taskId]);
+    if (rows.length > 0) {
+      res.json(rows.map(row => ({
+        id: row.id,
+        type: row.type,
+        answer: row.gt,
+        image: `${BACKEND_DOMAIN}:${PORT}/images/${row.src}`,
+        distribution: row.distribution || ''
+      })));
+    } else {
+      res.status(404).send();
+    }
+    console.log(req.url);
   })
 
   app.get('/api/dot-task', async (req, res) => {

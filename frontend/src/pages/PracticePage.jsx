@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {backendUrl} from "../index";
 
-export default function PracticePage({group, onComplete}) {
+export default function PracticePage({group, task, onComplete}) {
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [input, setInput] = useState('');
@@ -15,20 +15,20 @@ export default function PracticePage({group, onComplete}) {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(new URL(`/api/practice-questions?group=${group}`, backendUrl));
+        const res = await fetch(new URL(`/api/practice-questions?group=${group}&task=${task.id}`, backendUrl));
         if (res.ok && res.status === 200) {
           const data = await res.json();
           setQuestions(data);
+          setCurrent(0);  // for some reason, current is not set to 0 in consecutive rerenders
           setLoading(false);
         } else {
-          throw new Error('Backend error: ' + res.statusText);
-
+          alert('Backend error: ' + res.statusText);
         }
       } catch (err) {
-        alert(err);  // includes those from res.json()
+        alert(err);  // includes those raised by res.json()
       }
     })();
-  }, [group]);
+  }, [task]);
 
   useEffect(() => {
     if (loading || showFeedback) return;
@@ -80,7 +80,8 @@ export default function PracticePage({group, onComplete}) {
       <h2>Practice Task {current + 1} / {questions.length}</h2>
       <div style={{margin: '1em 0'}}>
         {imgSrc ? (
-          <img src={imgSrc} alt="practice" style={{maxWidth: '100%', maxHeight: 400, border: '1px solid #ccc', minWidth: 180,}}/>
+          <img src={imgSrc} alt="practice"
+               style={{maxWidth: '100%', maxHeight: 400, border: '1px solid #ccc', minWidth: 180,}}/>
         ) : <div>No image</div>}
       </div>
       {!showFeedback && (

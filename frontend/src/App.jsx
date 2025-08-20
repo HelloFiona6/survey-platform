@@ -58,7 +58,7 @@ function App() {
       }}/>;
       break;
     case 'practice':
-      pageElement = <PracticePage group={user.group} onComplete={() => {
+      pageElement = <PracticePage group={user.group} task={tasksRef.current[currentTaskIndex]} onComplete={() => {
         const nextIndex = currentTaskIndex + 1;
         if (nextIndex >= tasksRef.current.length) {
           alert(`Only having ${tasksRef.current.length} tasks, but current task is NO.${currentTaskIndex}`);
@@ -69,7 +69,6 @@ function App() {
           else setPage('mainTasks');
         }
         setCurrentTaskIndex(nextIndex);
-
       }}/>;
       break;
     case 'mainTasks':
